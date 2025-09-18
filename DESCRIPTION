@@ -1,0 +1,28 @@
+Package: SimpleUpset
+Type: Package
+Title: Create UpSet plots
+Version: 0.0.1
+Authors@R: c(
+    person(
+      "Stevie", "Pederson",
+      email = "stephen.pederson.au@gmail.com",
+      role = c("aut", "cre")
+    )
+  )
+Description: Create UpSet plots using a combination of ggplot2 and patchwork
+License: GPL-4
+Encoding: UTF-8
+LazyData: true
+Depends:
+  ggplot2 (>= 4.0.0),
+  patchwork,
+  R (>= 4.5.0),
+Imports:
+  dplyr,
+  rlang,
+  tidyr,
+  tidyselect
+Suggests: 
+  readr,
+  UpSetR
+RoxygenNote: 7.3.3
