@@ -23,6 +23,8 @@ simpleUpSet(
   scale_y_intersect = scale_y_continuous(name = "Intersection Size"),
   scale_fill_sets = scale_fill_discrete(),
   scale_fill_intersect = scale_fill_discrete(),
+  scale_grid_colour = scale_colour_discrete(),
+  scale_grid_fill = scale_fill_discrete(),
   annotations = list(),
   width = 0.75,
   height = 0.75,
@@ -30,7 +32,7 @@ simpleUpSet(
   stripe_colours = c("grey90", "white"),
   thm_intersect = NULL,
   thm_sets = NULL,
-  thm_mat = NULL,
+  thm_grid = NULL,
   grid_x_title = NULL,
   guides = "keep",
   top_left = NULL,
@@ -68,6 +70,9 @@ Can be used to over-ride default axis names, labelling and expansions}
 \item{scale_fill_sets, scale_fill_intersect}{Discrete scales to use when
 optionally filling bars by an additional column in 'x'}
 
+\item{scale_grid_colour, scale_grid_fill}{Colour scales passed to all points
+and segments in the intersections matrix}
+
 \item{annotations}{list where each element is a list of ggplot2 layers.
 Each element will be added as an upper annotation panel above the
 intersections plot. All layer types (geom, scale, aes, stat, labs etc) can be
@@ -80,7 +85,7 @@ passed with the exception of facets.}
 \item{stripe_colours}{Colours for background stripes in the lower two panels.
 For no stripes, set as NULL}
 
-\item{thm_intersect, thm_sets, thm_mat}{list objects containing
+\item{thm_intersect, thm_sets, thm_grid}{list objects containing
 additional theme arguments for each panel}
 
 \item{grid_x_title}{Optional axis title for the intersections matrix}
@@ -136,7 +141,7 @@ simpleUpSet(
   geom_sets = geom_bar(aes(fill = Decade)),
   scale_fill_intersect = scale_fill_brewer(palette = "Paired"),
   scale_fill_sets = scale_fill_brewer(palette = "Paired"),
-  thm_intersect = list(
+  thm_intersect = theme(
     legend.position = "inside",
     legend.position.inside = c(0.99, 0.99),
     legend.justification.inside = c(1, 1)

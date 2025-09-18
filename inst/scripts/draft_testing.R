@@ -20,12 +20,12 @@ simpleUpSet(
   geom_sets = geom_bar(aes(fill = Decade)),
   scale_fill_intersect = scale_fill_brewer(palette = "Paired"),
   scale_fill_sets = scale_fill_brewer(palette = "Paired"),
-  thm_intersect = list(
+  thm_intersect = theme(
     legend.position = "inside",
     legend.position.inside = c(0.99, 0.99),
     legend.justification.inside = c(1, 1)
   ),
-  thm_sets = list(legend.position = "none")
+  thm_sets = theme(legend.position = "none")
 )
 
 ## Add a simple boxplot

@@ -37,11 +37,13 @@
 #' optionally filling bars by an additional column in 'x'
 #' @param scale_x_sets,scale_y_intersect Optional scales to pass to these plots.
 #' Can be used to over-ride default axis names, labelling and expansions
+#' @param scale_grid_colour,scale_grid_fill Colour scales passed to all points
+#' and segments in the intersections matrix
 #' @param width,height Proportional width and height of the intersection panel
 #' @param stripe_colours Colours for background stripes in the lower two panels.
 #' For no stripes, set as NULL
 #' @param vjust_ylab Used to nudge the y-axis labels closer to the axis
-#' @param thm_intersect,thm_sets,thm_mat list objects containing
+#' @param thm_intersect,thm_sets,thm_grid list objects containing
 #' additional theme arguments for each panel
 #' @param guides Passed to [plot_layout()]
 #' @param top_left Optional ggplot object to show in the top left panel. Will
@@ -76,7 +78,7 @@
 #'   geom_sets = geom_bar(aes(fill = Decade)),
 #'   scale_fill_intersect = scale_fill_brewer(palette = "Paired"),
 #'   scale_fill_sets = scale_fill_brewer(palette = "Paired"),
-#'   thm_intersect = list(
+#'   thm_intersect = theme(
 #'     legend.position = "inside",
 #'     legend.position.inside = c(0.99, 0.99),
 #'     legend.justification.inside = c(1, 1)
@@ -133,10 +135,12 @@ simpleUpSet <- function(
     scale_y_intersect = scale_y_continuous(name = "Intersection Size"),
     scale_fill_sets = scale_fill_discrete(),
     scale_fill_intersect = scale_fill_discrete(),
+    scale_grid_colour = scale_colour_discrete(),
+    scale_grid_fill = scale_fill_discrete(),
     annotations = list(),
     width = 0.75, height = 0.75, vjust_ylab = 0.8,
     stripe_colours = c("grey90", "white"),
-    thm_intersect = NULL, thm_sets = NULL, thm_mat = NULL,
+    thm_intersect = NULL, thm_sets = NULL, thm_grid = NULL,
     grid_x_title = NULL, guides = "keep", top_left = NULL,
     ..., na.rm = TRUE
 ){
@@ -166,8 +170,8 @@ simpleUpSet <- function(
   keep_intersect <- droplevels(p_int@data$intersect)
   intersect_tbl <- dplyr::filter(intersect_tbl, intersect %in% keep_intersect)
   p_mat <- .plot_grid(
-    p_int, p_sets, intersect_points, intersect_segments, thm_mat, grid_x_title,
-    stripe_colours, empty_intersect_points
+    p_int, p_sets, intersect_points, intersect_segments, thm_grid, grid_x_title,
+    stripe_colours, empty_intersect_points, scale_grid_colour, scale_grid_fill
   )
 
   ## Blank plot
@@ -240,7 +244,7 @@ simpleUpSet <- function(
 #' @keywords internal
 .plot_grid <- function(
     p_int, p_sets, points_geom, segment_geom, thm, xlab, stripe_colours,
-    empty_geom
+    empty_geom, colour_scale, fill_scale
 ){
 
   sets <-levels(p_sets@data$set)
@@ -265,6 +269,14 @@ simpleUpSet <- function(
   stopifnot(is(segment_geom$geom, "GeomSegment"))
   stopifnot(is(empty_geom$geom, "GeomPoint") | is(empty_geom$geom, "GeomBlank"))
 
+  ## Check scales
+  stopifnot(
+    is(colour_scale, "ScaleDiscrete") & colour_scale$aesthetics == "colour"
+  )
+  stopifnot(
+    is(fill_scale, "ScaleDiscrete") & fill_scale$aesthetics == "fill"
+  )
+
   ## Set custom geoms where needed
   stripe_geom <- .bg_stripes(sets, stripe_colours)
   if (is.null(segment_geom$mapping)) segment_geom$mapping <- aes()
@@ -276,6 +288,7 @@ simpleUpSet <- function(
   ## And the main figure
   p <- ggplot(grid_tbl, aes(intersect, set)) +
     stripe_geom + empty_geom + segment_geom + points_geom +
+    colour_scale + fill_scale +
     scale_y_discrete(name = NULL) +
     scale_x_discrete(name = xlab, labels = NULL) +
     theme(
@@ -363,8 +376,7 @@ simpleUpSet <- function(
 
   ## The default fill_scale
   stopifnot(
-    is(fill_scale, "ScaleDiscrete") &
-      fill_scale$aesthetics %in% c("fill", "character")
+    is(fill_scale, "ScaleDiscrete") & fill_scale$aesthetics ==  "fill"
   )
   stopifnot(is(sets_geom$geom, "GeomBar"))
 
