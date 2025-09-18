@@ -11,20 +11,19 @@ simpleUpSet(
   sort_intersect = TRUE,
   n_intersect = 20,
   min_size = 0,
-  fill_sets = NULL,
-  fill_intersect = NULL,
+  comma = TRUE,
+  geom_intersect = geom_bar(),
+  geom_sets = geom_bar(),
+  set_labels = geom_text(hjust = 1.1, size = 3.5),
+  intersect_labels = geom_text(vjust = -0.5, size = 3.5),
+  intersect_points = geom_point(size = 4, shape = 19),
+  intersect_segments = geom_segment(),
+  empty_intersect_points = geom_point(size = 4, shape = 19, colour = "grey70"),
+  scale_x_sets = scale_x_reverse(name = "Set Size"),
+  scale_y_intersect = scale_y_continuous(name = "Intersection Size"),
+  scale_fill_sets = scale_fill_discrete(),
+  scale_fill_intersect = scale_fill_discrete(),
   annotations = list(),
-  set_labels = geom_text(hjust = 1.1, size = 4),
-  intersect_labels = geom_text(vjust = -1, size = 4),
-  intersect_points,
-  intersect_segments,
-  empty_intersect_points,
-  set_label_fun = scales::comma,
-  intersect_label_fun = set_label_fun,
-  scale_x_sets,
-  scale_y_intersect,
-  scale_fill_sets,
-  scale_fill_intersect,
   width = 0.75,
   height = 0.75,
   vjust_ylab = 0.8,
@@ -32,9 +31,7 @@ simpleUpSet(
   thm_intersect = list(),
   thm_sets = list(),
   thm_mat = list(),
-  set_x_title = "Set Size",
-  intersect_y_title = "Intersection Size",
-  grid_x_title = "Intersection",
+  grid_x_title = NULL,
   guides = "keep",
   top_left = NULL,
   ...,
@@ -54,29 +51,28 @@ simpleUpSet(
 
 \item{min_size}{Only show intersections larger than this value}
 
-\item{fill_sets, fill_intersect}{Additional column name in x to fill either
-sets or intersections by. Each must be categorical}
+\item{comma}{logical(1) Add commas to intersection and set labels}
 
-\item{annotations}{list where each element is a list of ggplot2 layers.
-Each element will be added as an upper annotation panel above the
-intersections plot. All layer types (geom, scale, aes, stat, labs etc) can be
-passed with the exception of facets. Elements will be added after an initial,
-internal call to `ggplot(data, aes(x = intersect))`}
+\item{geom_intersect, geom_sets}{Default geoms passed to intersections and
+sets. Can only be \code{\link[ggplot2:geom_bar]{ggplot2::geom_bar()}}, but can be modified as needed}
 
-\item{set_labels, intersect_labels}{One of geom_text() or geom_label() with
-arguments set as preferred. Use `NULL` to hide set or intersect labels}
+\item{set_labels, intersect_labels}{One of \code{\link[ggplot2:geom_text]{ggplot2::geom_text()}} or \code{\link[ggplot2:geom_text]{ggplot2::geom_label()}}
+with arguments set as preferred. Use \code{NULL} to hide set or intersect labels}
 
-\item{intersect_points, intersect_segments, empty_intersect_points}{Specifications of [geom_point()] and [geom_segment()] which can be used to
-modify the defaults in the matrix panel}
-
-\item{set_label_fun, intersect_label_fun}{Functions applied to set labels and
-intersection labels}
+\item{intersect_points, intersect_segments, empty_intersect_points}{Specifications of \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} and \code{\link[ggplot2:geom_segment]{ggplot2::geom_segment()}}
+which can be used to modify the defaults in the matrix panel intersection labels}
 
 \item{scale_x_sets, scale_y_intersect}{Optional scales to pass to these plots.
 Can be used to over-ride default axis names, labelling and expansions}
 
 \item{scale_fill_sets, scale_fill_intersect}{Discrete scales to use when
 optionally filling bars by an additional column in 'x'}
+
+\item{annotations}{list where each element is a list of ggplot2 layers.
+Each element will be added as an upper annotation panel above the
+intersections plot. All layer types (geom, scale, aes, stat, labs etc) can be
+passed with the exception of facets. Elements will be added after an initial,
+internal call to \code{ggplot(data, aes(x = intersect))}}
 
 \item{width, height}{Proportional width and height of the intersection panel}
 
@@ -88,21 +84,74 @@ For no stripes, set as NULL}
 \item{thm_intersect, thm_sets, thm_mat}{list objects containing
 additional theme arguments for each panel}
 
-\item{set_x_title, intersect_y_title, grid_x_title}{Axis titles for various
-panels. Set to NULL to remove titles}
+\item{grid_x_title}{Optional axis title for the intersections matrix}
 
-\item{guides}{Passed to [patchwork::plot_layout()]}
+\item{guides}{Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
 
 \item{top_left}{Optional ggplot object to show in the top left panel. Will
 default to an empty ggplot object}
 
 \item{...}{Not used}
 
-\item{na.rm}{`NA` handling}
+\item{na.rm}{\code{NA} handling}
 }
 \value{
 Object of class 'patchwork' containing multiple ggplot panels
 }
 \description{
 Make simple UpSet plots using ggplot2 and patchwork
+}
+\examples{
+## Use the movies data from the package UpSetR
+library(tidyverse)
+theme_set(theme_bw())
+f <- system.file("extdata", "movies.csv", package = "UpSetR")
+movies <- read_delim(f, delim = ";") \%>\%
+ mutate(
+   ## Break the Release dates into decades
+   Decade = cut(
+     ReleaseDate, breaks = seq(1910, 2000, by = 10),
+     labels = paste(seq(1911, 1991, by = 10), seq(1920, 2000, by = 10), sep = "-")
+   ) \%>\% fct_rev()
+ )
+ sets <- c("Action", "Comedy", "Drama", "Thriller", "Romance")
+## A basic UpSet plot
+simpleUpSet(movies, sets)
+
+## Fill intersects & sets by decade, showing fewer intersects
+simpleUpSet(
+  movies, sets, min_size = 20,
+  geom_intersect = geom_bar(aes(fill = Decade)),
+  geom_sets = geom_bar(aes(fill = Decade)),
+  scale_fill_intersect = scale_fill_brewer(palette = "Paired"),
+  scale_fill_sets = scale_fill_brewer(palette = "Paired"),
+  thm_intersect = list(
+    legend.position = "inside",
+    legend.position.inside = c(0.99, 0.99),
+    legend.justification.inside = c(1, 1)
+  ),
+ thm_sets = list(legend.position = "none")
+)
+
+## Add a simple boxplot as an additional upper panel
+simpleUpSet(
+  movies, sets, n_intersect = 10,
+  annotations = list(geom_boxplot(aes(y = AvgRating))),
+)
+
+## Add a far more detailed upper plot
+simpleUpSet(
+  movies, sets, n_intersect = 10,
+  annotations = list(
+    list(
+      aes(y = AvgRating),
+      geom_jitter(aes(colour = Decade), height = 0, width = 0.3, alpha = 0.5),
+      geom_violin(fill = NA, quantiles = 0.5, quantile.linetype = 1),
+      scale_colour_brewer(palette = "Paired"),
+      guides(colour = guide_legend(nrow = 2, reverse = TRUE))
+    )
+  ), guides = "collect"
+) &
+  theme(legend.position = "bottom")
+
 }
