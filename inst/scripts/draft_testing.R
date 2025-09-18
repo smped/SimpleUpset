@@ -49,6 +49,15 @@ simpleUpSet(
 ) &
   theme(legend.position = "bottom")
 
+set_cols <- c("darkred", "forestgreen", "blue", "blue", "blue")
+names(set_cols) <- sets
+simpleUpSet(
+  movies, sets,
+  geom_sets = geom_bar(aes(fill = set)),
+  scale_fill_sets = scale_fill_manual(values = set_cols),
+  thm_sets = theme(legend.position = "none")
+)
+
 ## Modify the grid
 simpleUpSet(
   movies, sets,

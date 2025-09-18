@@ -2,6 +2,18 @@
 #'
 #' Make simple UpSet plots using ggplot2 and patchwork
 #'
+#' @details
+#' Taking a subset of columns from a data.frame, create an UpSet plot showing
+#' all intersections as specified.
+#' Selected columns must contain logical values or be strictly 0/1 values.
+#'
+#' Additional columns can be used where appropriate for creating boxplots etc.
+#' Internally, data objects will have the variables `set` and `intersect` which
+#' can be referred to when passing custom aes() mappings to various layers.
+#' Any additional layers passed using `annotations()` will have layers added
+#' after an initial, internal call to `ggplot(data, aes(x = intersect))`.
+#'
+#'
 #' @param x Input data frame
 #' @param sets Character vector listing columns of x to plot
 #' @param sort_sets Logical, if TRUE sort sets by size
@@ -14,8 +26,7 @@
 #' @param annotations list where each element is a list of ggplot2 layers.
 #' Each element will be added as an upper annotation panel above the
 #' intersections plot. All layer types (geom, scale, aes, stat, labs etc) can be
-#' passed with the exception of facets. Elements will be added after an initial,
-#' internal call to `ggplot(data, aes(x = intersect))`
+#' passed with the exception of facets.
 #' @param set_labels,intersect_labels One of [geom_text()] or [geom_label()]
 #' with arguments set as preferred. Use `NULL` to hide set or intersect labels
 #' @param intersect_points,intersect_segments,empty_intersect_points
@@ -93,6 +104,16 @@
 #' ) &
 #'   theme(legend.position = "bottom")
 #'
+#' ## Modify set colours
+#' set_cols <- c("darkred", "forestgreen", "blue", "blue", "blue")
+#' names(set_cols) <- sets
+#' simpleUpSet(
+#'   movies, sets,
+#'   geom_sets = geom_bar(aes(fill = set)),
+#'   scale_fill_sets = scale_fill_manual(values = set_cols),
+#'   thm_sets = theme(legend.position = "none")
+#' )
+#'
 #' @import patchwork
 #' @import ggplot2
 #' @export
@@ -114,7 +135,7 @@ simpleUpSet <- function(
     annotations = list(),
     width = 0.75, height = 0.75, vjust_ylab = 0.8,
     stripe_colours = c("grey90", "white"),
-    thm_intersect = list(), thm_sets = list(), thm_mat = list(),
+    thm_intersect = NULL, thm_sets = NULL, thm_mat = NULL,
     grid_x_title = NULL, guides = "keep", top_left = NULL,
     ..., na.rm = TRUE
 ){
@@ -262,10 +283,7 @@ simpleUpSet <- function(
       axis.ticks = element_blank()
     )
   ## Optional theme modifications
-  if (length(thm) & is.list(thm)) {
-    valid <- intersect(names(thm), names(formals(theme)))
-    p <- p + do.call("theme", thm[valid])
-  }
+  if (is_theme(thm)) p <- p + thm
   p
 }
 
@@ -316,10 +334,7 @@ simpleUpSet <- function(
 
   }
   ## Optional theme modifications
-  if (length(thm) & is.list(thm)) {
-    valid <- intersect(names(thm), names(formals(theme)))
-    p <- p + do.call("theme", thm[valid])
-  }
+  if (is_theme(thm)) p <- p + thm
   p
 
 }
@@ -382,12 +397,8 @@ simpleUpSet <- function(
       margins = margin(5.5, 0, 5.5, 5.5)
     )
 
-  ## Optionally modify the theme
-  if (length(thm) & is.list(thm)) {
-    valid <- intersect(names(thm), names(formals(theme)))
-    p <- p + do.call("theme", thm[valid])
-  }
-
+  ## Optional theme modifications
+  if (is_theme(thm)) p <- p + thm
   p
 
 }

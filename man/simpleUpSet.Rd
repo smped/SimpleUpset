@@ -28,9 +28,9 @@ simpleUpSet(
   height = 0.75,
   vjust_ylab = 0.8,
   stripe_colours = c("grey90", "white"),
-  thm_intersect = list(),
-  thm_sets = list(),
-  thm_mat = list(),
+  thm_intersect = NULL,
+  thm_sets = NULL,
+  thm_mat = NULL,
   grid_x_title = NULL,
   guides = "keep",
   top_left = NULL,
@@ -71,8 +71,7 @@ optionally filling bars by an additional column in 'x'}
 \item{annotations}{list where each element is a list of ggplot2 layers.
 Each element will be added as an upper annotation panel above the
 intersections plot. All layer types (geom, scale, aes, stat, labs etc) can be
-passed with the exception of facets. Elements will be added after an initial,
-internal call to \code{ggplot(data, aes(x = intersect))}}
+passed with the exception of facets.}
 
 \item{width, height}{Proportional width and height of the intersection panel}
 
@@ -100,6 +99,17 @@ Object of class 'patchwork' containing multiple ggplot panels
 }
 \description{
 Make simple UpSet plots using ggplot2 and patchwork
+}
+\details{
+Taking a subset of columns from a data.frame, create an UpSet plot showing
+all intersections as specified.
+Selected columns must contain logical values or be strictly 0/1 values.
+
+Additional columns can be used where appropriate for creating boxplots etc.
+Internally, data objects will have the variables \code{set} and \code{intersect} which
+can be referred to when passing custom aes() mappings to various layers.
+Any additional layers passed using \code{annotations()} will have layers added
+after an initial, internal call to \code{ggplot(data, aes(x = intersect))}.
 }
 \examples{
 ## Use the movies data from the package UpSetR
@@ -153,5 +163,15 @@ simpleUpSet(
   ), guides = "collect"
 ) &
   theme(legend.position = "bottom")
+
+## Modify set colours
+set_cols <- c("darkred", "forestgreen", "blue", "blue", "blue")
+names(set_cols) <- sets
+simpleUpSet(
+  movies, sets,
+  geom_sets = geom_bar(aes(fill = set)),
+  scale_fill_sets = scale_fill_manual(values = set_cols),
+  thm_sets = theme(legend.position = "none")
+)
 
 }
