@@ -17,7 +17,7 @@
 #' internal call to `ggplot(data, aes(x = intersect))`
 #' @param set_labels,intersect_labels One of geom_text() or geom_label() with
 #' arguments set as preferred. Use `NULL` to hide set or intersect labels
-#' @param intersect_point,intersect_segments,empty_intersect_points
+#' @param intersect_points,intersect_segments,empty_intersect_points
 #' Specifications of [geom_point()] and [geom_segment()] which can be used to
 #' modify the defaults in the matrix panel
 #' @param set_label_fun,intersect_label_fun Functions applied to set labels and
@@ -81,8 +81,9 @@ simpleUpSet <- function(
   intersect_tbl <- dplyr::filter(
     intersect_tbl, as.integer(intersect) <= n_intersect
   )
-  vjust <- max(nchar(sets)) * vjust_ylab
+
   ## Intersections panel
+  vjust <- max(nchar(sets)) * vjust_ylab ## Place labels closer to y
   p_int <- .plot_intersect(
     intersect_tbl, min_size, fill_intersect, scale_y_intersect,
     intersect_labels, intersect_label_fun, scale_fill_intersect, vjust,
@@ -165,6 +166,7 @@ simpleUpSet <- function(
 #' @importFrom dplyr distinct summarise
 #' @importFrom rlang !!! syms
 #' @importFrom tidyr pivot_longer
+#' @importFrom methods is
 #' @import ggplot2
 #' @keywords internal
 .plot_grid <- function(
@@ -178,12 +180,14 @@ simpleUpSet <- function(
   grid_tbl <- pivot_longer(
     grid_tbl, all_of(sets), names_to = "set", values_to = "in_group"
   )
-  grid_tbl <- dplyr::filter(grid_tbl, in_group)
+  grid_tbl <- grid_tbl[grid_tbl[["in_group"]],]
   grid_tbl$set <- factor(grid_tbl$set, levels = sets)
   grid_tbl$set_int <- as.integer(grid_tbl$set)
 
   seg_tbl <- summarise(
-    grid_tbl, y_max = max(set_int), y_min = min(set_int), .by = intersect
+    grid_tbl,
+    y_max = max(!!sym("set_int")), y_min = min(!!sym("set_int")),
+    .by = intersect
   )
 
   if (missing(points_geom)) points_geom <- geom_point(size = 4, shape = 19)
@@ -202,20 +206,20 @@ simpleUpSet <- function(
   if (missing(empty_geom)) empty_geom <- geom_point(
     size = 4, shape = 19, colour = "grey70", alpha = 0.7
   )
-  empty_geom$data <- tidyr::complete(grid_tbl, intersect, set)
+  empty_geom$data <- tidyr::complete(grid_tbl, all_of(c("intersect", "set")))
   stopifnot(
     is(empty_geom, "LayerInstance") & is(empty_geom$geom, "GeomPoint")
   )
 
   stripe_geom <- NULL
   if (!is.null(stripe_colours)) {
-    stripe_tbl <- tibble(
+    stripe_tbl <- data.frame(
       set = sets,
       xmin = -Inf, xmax = Inf,
       col = rep_len(stripe_colours, length(sets))
     )
     stripe_geom <- geom_rect(
-      mapping = aes(xmin = xmin, xmax = xmax, y = set),
+      mapping = aes(xmin = !!sym("xmin"), xmax = !!sym("xmax"), y = set),
       data = stripe_tbl, height = 1,
       fill = stripe_tbl$col, inherit.aes = FALSE
     )
@@ -239,6 +243,7 @@ simpleUpSet <- function(
 
 #' @importFrom rlang !! sym
 #' @importFrom dplyr summarise
+#' @importFrom methods is
 #' @import ggplot2
 #' @keywords internal
 .plot_intersect <- function(
@@ -298,6 +303,8 @@ simpleUpSet <- function(
 }
 
 #' @importFrom rlang !! sym
+#' @importFrom dplyr across summarise
+#' @importFrom tidyr pivot_longer
 #' @import ggplot2
 #' @keywords internal
 .plot_sets <- function(
@@ -322,7 +329,7 @@ simpleUpSet <- function(
   sets_tbl <- pivot_longer(
     sets_tbl, all_of(sets), names_to = "set", values_to = "n"
   )
-  sets_tbl <- dplyr::filter(sets_tbl, n > 0)
+  sets_tbl <- sets_tbl[sets_tbl[["n"]] > 0,]
   sets_tbl$set <- factor(sets_tbl$set, levels = set_levels)
   sets_tbl <- dplyr::arrange(sets_tbl, set)
 
@@ -333,13 +340,13 @@ simpleUpSet <- function(
 
   stripe_geom <- NULL
   if (!is.null(stripe_colours)){
-    stripe_tbl <- tibble(
+    stripe_tbl <- data.frame(
       set = factor(set_levels, levels = set_levels),
       xmin = -Inf, xmax = Inf,
       col = rep_len(stripe_colours, length(set_levels))
     )
     stripe_geom <- geom_rect(
-      mapping = aes(xmin = xmin, xmax = xmax, y = set),
+      mapping = aes(xmin = !!sym("xmin"), xmax = !!sym("xmax"), y = set),
       data = stripe_tbl, height = 1,
       fill = stripe_tbl$col, inherit.aes = FALSE
     )
@@ -361,10 +368,8 @@ simpleUpSet <- function(
       is(set_labels, "LayerInstance") &
         is(set_labels$geom) %in% c("GeomLabel", "GeomText")
     )
-    set_labels$mapping <- aes(
-      x = !!sym("n"), y = !!sym("set"), label = !!sym("label")
-    )
-    counts_tbl <- tibble(
+    set_labels$mapping <- aes(x = n, y = set, label = label)
+    counts_tbl <- data.frame(
       set = factor(names(col_sums), levels = set_levels), n = col_sums
     )
     counts_tbl$label <- counts_tbl$n
@@ -382,6 +387,8 @@ simpleUpSet <- function(
 
 }
 
+#' @importFrom dplyr summarise
+#' @importFrom tidyselect all_of
 #' @keywords internal
 .check_sets <- function(x, sets, na.rm){
 
@@ -413,21 +420,26 @@ simpleUpSet <- function(
 
   ## This simply adds the intersect number as a new column 'intersect'
   if (!is.null(fill)) {
-    fill <- match.arg(fill, colnames(x))
-    if (is.character(x[[fill]])) x[[fill]] <- as.factor(x[[fill]])
-    stopifnot(is.factor(x[[fill]]))
-
+    ## Ensure only discrete columns can be used
+    fill <- intersect(fill, colnames(x))[1]
+    if (!is.character(x[[fill]])) x[[fill]] <- as.factor(x[[fill]])
+    if (!is.factor(x[[fill]])) stop(
+      "Requested fill column must be passed as a character or factor"
+    )
   }
 
+  ## Coerce all set columns to be logical & remove rows where all are FALSE
   x[sets] <- lapply(x[sets], as.logical)
-  x <- dplyr::filter(x, if_any(tidyselect::all_of(sets)))
+  x <- dplyr::filter(x, if_any(all_of(sets)))
   x <- droplevels(x)
-  tbl <- summarise(x, n = dplyr::n(), .by = c(all_of(c(sets, fill))))
 
+  ## Determine the intersect number to a column in the original
   set_tbl <- summarise(x, n = dplyr::n(), .by = c(all_of(sets)))
   if (sort) set_tbl <- set_tbl[order(set_tbl$n, decreasing = TRUE),]
   set_tbl$intersect <- as.factor(seq_len(nrow(set_tbl)))
   set_tbl$n <- NULL
+
+  ## Return the original table with intersect numbers & logical columns
   left_join(x, set_tbl, by = sets)
 
 }
@@ -437,19 +449,5 @@ simpleUpSet <- function(
 ##   - Perhaps these could be set directly in a column of actual colours?
 ## Highlighting points/segments on the grid plot
 
-# library(tidyverse)
-# library(patchwork)
-# theme_set(theme_bw())
-# movies <- readr::read_delim(system.file("extdata", "movies.csv", package = "UpSetR"), delim = ";") %>%
-#   # dplyr::slice(1:500) %>%
-#   dplyr::filter(ReleaseDate >= 1990) %>%
-#   mutate(ReleaseDate = as.factor(ReleaseDate))
-# simpleUpSet(
-#   movies, sets = c("Action", "Adventure", "Comedy", "Crime", "Drama"),
-#   # n_intersect = 10, fill_intersect = "ReleaseDate",
-#   # annotations = list(list(aes(y = AvgRating), geom_boxplot())),
-#   # upper_var = "AvgRating", upper_geom = "boxplot", upper_args = list(fill = "white"),
-#   # guides = "collect", mat_args = list(size = 5, shape = 21, fill = "red")
-# )
 
 

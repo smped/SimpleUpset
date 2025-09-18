@@ -66,6 +66,9 @@ internal call to `ggplot(data, aes(x = intersect))`}
 \item{set_labels, intersect_labels}{One of geom_text() or geom_label() with
 arguments set as preferred. Use `NULL` to hide set or intersect labels}
 
+\item{intersect_points, intersect_segments, empty_intersect_points}{Specifications of [geom_point()] and [geom_segment()] which can be used to
+modify the defaults in the matrix panel}
+
 \item{set_label_fun, intersect_label_fun}{Functions applied to set labels and
 intersection labels}
 
@@ -96,9 +99,6 @@ default to an empty ggplot object}
 \item{...}{Not used}
 
 \item{na.rm}{`NA` handling}
-
-\item{intersect_point, intersect_segments, empty_intersect_points}{Specifications of [geom_point()] and [geom_segment()] which can be used to
-modify the defaults in the matrix panel}
 }
 \value{
 Object of class 'patchwork' containing multiple ggplot panels
