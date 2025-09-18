@@ -5,10 +5,18 @@ movies <- readr::read_delim(system.file("extdata", "movies.csv", package = "UpSe
   # dplyr::slice(1:500) %>%
   dplyr::filter(ReleaseDate >= 1990) %>%
   mutate(ReleaseDate = as.factor(ReleaseDate))
+## Basic
 simpleUpSet(
   movies, sets = c("Action", "Adventure", "Comedy", "Crime", "Drama"),
-  # n_intersect = 10, fill_intersect = "ReleaseDate",
-  # annotations = list(list(aes(y = AvgRating), geom_boxplot())),
-  # upper_var = "AvgRating", upper_geom = "boxplot", upper_args = list(fill = "white"),
-  # guides = "collect", mat_args = list(size = 5, shape = 21, fill = "red")
+)
+## Fill with fewer intersects
+simpleUpSet(
+  movies, sets = c("Action", "Adventure", "Comedy", "Crime", "Drama"),
+  n_intersect = 10, fill_intersect = "ReleaseDate"
+)
+## Add the boxplot
+simpleUpSet(
+  movies, sets = c("Action", "Adventure", "Comedy", "Crime", "Drama"),
+  n_intersect = 10, fill_intersect = "ReleaseDate",
+  annotations = list(list(aes(y = AvgRating), geom_boxplot()))
 )

@@ -141,17 +141,18 @@ simpleUpSet <- function(
       annotations <- list(annotations)
     }
   }
-
+  ## Check we only have ggplot elements here
   valid <- vapply(
     annotations, \(x) all(vapply(x, .check_gg_layers, logical(1))), logical(1)
   )
   if (!all(valid))
     stop("All elements of annotations must be a list of ggplot2 layers etc")
 
+  ## Make a list for panels for wrapping
   lapply(
     annotations, \(x) {
       p <- ggplot(tbl, aes(x = intersect))
-      for (i in seq_along(x)) p <- p + x[[i]]
+      for (i in seq_along(x)) p <- p + x[[i]] ## Add layers sequentially
       p + theme(
         axis.ticks.x.bottom = element_blank(),
         axis.text.x = element_blank(),
@@ -165,7 +166,7 @@ simpleUpSet <- function(
 
 #' @importFrom dplyr distinct summarise
 #' @importFrom rlang !!! syms
-#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr pivot_longer complete
 #' @importFrom methods is
 #' @import ggplot2
 #' @keywords internal
@@ -175,7 +176,7 @@ simpleUpSet <- function(
 ){
 
   sets <-levels(p_sets@data$set)
-
+  ## The grid tbl will contain all intersections
   grid_tbl <- distinct(p_int@data, !!!syms(c(sets, "intersect")))
   grid_tbl <- pivot_longer(
     grid_tbl, all_of(sets), names_to = "set", values_to = "in_group"
@@ -183,13 +184,13 @@ simpleUpSet <- function(
   grid_tbl <- grid_tbl[grid_tbl[["in_group"]],]
   grid_tbl$set <- factor(grid_tbl$set, levels = sets)
   grid_tbl$set_int <- as.integer(grid_tbl$set)
-
+  ## For the segments, we only need the outer intersections on the grid
   seg_tbl <- summarise(
-    grid_tbl,
-    y_max = max(!!sym("set_int")), y_min = min(!!sym("set_int")),
+    grid_tbl, y_max = max(!!sym("set_int")), y_min = min(!!sym("set_int")),
     .by = intersect
   )
 
+  ## Set default geoms for points, empty intersections & segment
   if (missing(points_geom)) points_geom <- geom_point(size = 4, shape = 19)
   stopifnot(
     is(points_geom, "LayerInstance") & is(points_geom$geom, "GeomPoint")
@@ -206,25 +207,13 @@ simpleUpSet <- function(
   if (missing(empty_geom)) empty_geom <- geom_point(
     size = 4, shape = 19, colour = "grey70", alpha = 0.7
   )
-  empty_geom$data <- tidyr::complete(grid_tbl, all_of(c("intersect", "set")))
+  empty_geom$data <- complete(grid_tbl, intersect, set)
   stopifnot(
     is(empty_geom, "LayerInstance") & is(empty_geom$geom, "GeomPoint")
   )
 
-  stripe_geom <- NULL
-  if (!is.null(stripe_colours)) {
-    stripe_tbl <- data.frame(
-      set = sets,
-      xmin = -Inf, xmax = Inf,
-      col = rep_len(stripe_colours, length(sets))
-    )
-    stripe_geom <- geom_rect(
-      mapping = aes(xmin = !!sym("xmin"), xmax = !!sym("xmax"), y = set),
-      data = stripe_tbl, height = 1,
-      fill = stripe_tbl$col, inherit.aes = FALSE
-    )
-  }
-
+  ## And the main figure
+  stripe_geom <- .bg_stripes(sets, stripe_colours)
   p <- ggplot(grid_tbl, aes(intersect, set)) +
     stripe_geom + empty_geom + segment_geom + points_geom +
     scale_y_discrete(name = NULL) +
@@ -234,6 +223,7 @@ simpleUpSet <- function(
       axis.text.y = element_text(hjust = 0.5),
       axis.ticks = element_blank()
     )
+  ## Optional theme modifications
   if (length(thm) & is.list(thm)) {
     valid <- intersect(names(thm), names(formals(theme)))
     p <- p + do.call("theme", thm[valid])
@@ -251,34 +241,43 @@ simpleUpSet <- function(
     fill_scale, vj, thm, ylab
 ){
 
+  ## Setup the default scale for y
   if (missing(y_scale)) y_scale <- scale_y_continuous(
     expand = expansion(c(0, 0.1)), labels = scales::comma
   )
   stopifnot(is(y_scale, "ScaleContinuousPosition"))
   if (is_waiver(y_scale$name)) y_scale$name <- ylab
-
+  ## The deafult fill scale. Will be ignored if no fill value is passed
   if (missing(fill_scale)) fill_scale <- scale_fill_discrete()
   stopifnot(is(fill_scale, "ScaleDiscrete") & fill_scale$aesthetics == "fill")
 
-  bar_mapping <- aes()
-  if (!is.null(fill)) {
-    fill <- match.arg(fill, colnames(tbl))
-    bar_mapping <- aes(fill = !!sym(fill))
-  }
-
+  ## The totals summarised by intersect (ignoring any fill columns)
   totals_df <- summarise(tbl, n = dplyr::n(), .by = all_of("intersect"))
   totals_df <- dplyr::filter(totals_df, n > min_size)
   totals_df$intersect <- droplevels(totals_df$intersect)
   tbl <- dplyr::filter(tbl, intersect %in% levels(totals_df$intersect))
 
+  ## The mappings for geom_bar
+  bar_geom <- geom_bar()
+  if (!is.null(fill)) {
+    fill <- intersect(fill, colnames(tbl))[[1]]
+    stopifnot(length(fill) == 1)
+    bar_geom <- geom_bar(aes(fill = !!sym(fill)))
+  }
+  ## The intial plot
   p <- ggplot(tbl, aes(!!sym("intersect"))) +
-    geom_bar(bar_mapping) + fill_scale +
-    y_scale +
-    scale_x_discrete(name = NULL, labels = NULL)
+    bar_geom + fill_scale + y_scale +
+    scale_x_discrete(name = NULL, labels = NULL) +
+    theme(
+      axis.title.y = element_text(vjust = -vj),
+      axis.ticks.x.bottom = element_blank(),
+      margins = margin(5.5, 5.5, 0, 0)
+    )
+  ## Add labels if chosen
   if (!is.null(label_geom)) {
+
     totals_df$label <- totals_df$n
     if (is.function(label_fun)) totals_df$label <- label_fun(totals_df$n)
-
     ## This should be a geom_text/label instance set in the initial arguments
     stopifnot(
       is(label_geom, "LayerInstance") &
@@ -286,14 +285,10 @@ simpleUpSet <- function(
     )
     label_geom$mapping <- aes(y = !!sym("n"), label = !!sym("label"))
     label_geom$data <- totals_df
-
     p <- p + label_geom
+
   }
-  p <- p + theme(
-    axis.title.y = element_text(vjust = -vj),
-    axis.ticks.x.bottom = element_blank(),
-    margins = margin(5.5, 5.5, 0, 0)
-  )
+  ## Optional theme modifications
   if (length(thm) & is.list(thm)) {
     valid <- intersect(names(thm), names(formals(theme)))
     p <- p + do.call("theme", thm[valid])
@@ -312,19 +307,13 @@ simpleUpSet <- function(
     xlab, stripe_colours
 ){
 
-  if (missing(x_scale)) x_scale <- scale_x_reverse(
-    expand = expansion(c(0.15, 0)), labels = scales::comma
-  )
-  stopifnot(is(x_scale, "ScaleContinuousPosition"))
-  if (is_waiver(x_scale$name)) x_scale$name <- xlab
-
+  ## Get the set levels
   col_sums <- colSums(tbl[sets])
   set_levels <- sets
-  ## Need to pass
   if (sort) set_levels <- names(sort(col_sums))
 
+  ## Form the basic object with sets, but retaining th2 fill column if passed
   if (!is.null(fill)) stopifnot(fill %in% colnames(tbl))
-
   sets_tbl <- summarise(tbl, across(all_of(sets), sum), .by = all_of(fill))
   sets_tbl <- pivot_longer(
     sets_tbl, all_of(sets), names_to = "set", values_to = "n"
@@ -333,27 +322,44 @@ simpleUpSet <- function(
   sets_tbl$set <- factor(sets_tbl$set, levels = set_levels)
   sets_tbl <- dplyr::arrange(sets_tbl, set)
 
+  ## Aesthetic mappings
   mapping <- aes(x = !!sym("n"), y = !!sym("set"))
   if (!is.null(fill)) mapping$fill <- sym(fill)
+  ## The default fill_scale
   if (missing(fill_scale)) fill_scale <- scale_fill_discrete()
   stopifnot(is(fill_scale, "ScaleDiscrete") & fill_scale$aesthetics == "fill")
 
-  stripe_geom <- NULL
-  if (!is.null(stripe_colours)){
-    stripe_tbl <- data.frame(
-      set = factor(set_levels, levels = set_levels),
-      xmin = -Inf, xmax = Inf,
-      col = rep_len(stripe_colours, length(set_levels))
+  x_exp <- 0.1
+  if (!is.null(set_labels)) {
+    ## Setup the labels for plotting using colSums
+    counts_tbl <- data.frame(
+      set = factor(names(col_sums), levels = set_levels), n = col_sums
     )
-    stripe_geom <- geom_rect(
-      mapping = aes(xmin = !!sym("xmin"), xmax = !!sym("xmax"), y = set),
-      data = stripe_tbl, height = 1,
-      fill = stripe_tbl$col, inherit.aes = FALSE
+    counts_tbl$label <- counts_tbl$n
+    if (is.function(lab_fun)) counts_tbl$label <- lab_fun(counts_tbl$label)
+
+    ## This should be a geom_text/label instance set in the initial arguments
+    stopifnot(
+      is(set_labels, "LayerInstance") &
+        is(set_labels$geom) %in% c("GeomLabel", "GeomText")
     )
+    set_labels$mapping <- aes(x = n, y = set, label = label)
+    set_labels$data <- counts_tbl
+    ## Expand x based on the maximum value. Might go weird if transforming
+    x_exp <- x_exp + max(nchar(counts_tbl$label)) * 0.03
   }
 
+  ## Set the default x-axis
+  if (missing(x_scale)) x_scale <- scale_x_reverse(
+    expand = expansion(c(x_exp, 0)), labels = scales::comma
+  )
+  stopifnot(is(x_scale, "ScaleContinuousPosition"))
+  if (is_waiver(x_scale$name)) x_scale$name <- xlab
+
+  ## The main plot
+  stripe_geom <- .bg_stripes(set_levels, stripe_colours)
   p <- ggplot(sets_tbl) +
-    stripe_geom + geom_col(mapping) + fill_scale +
+    stripe_geom + geom_col(mapping) + set_labels + fill_scale +
     scale_y_discrete(position = "right", name = NULL, labels = NULL) +
     x_scale +
     theme(
@@ -362,22 +368,7 @@ simpleUpSet <- function(
       margins = margin(5.5, 0, 5.5, 5.5)
     )
 
-  if (!is.null(set_labels)) {
-    ## This should be a geom_text/label instance set in the initial arguments
-    stopifnot(
-      is(set_labels, "LayerInstance") &
-        is(set_labels$geom) %in% c("GeomLabel", "GeomText")
-    )
-    set_labels$mapping <- aes(x = n, y = set, label = label)
-    counts_tbl <- data.frame(
-      set = factor(names(col_sums), levels = set_levels), n = col_sums
-    )
-    counts_tbl$label <- counts_tbl$n
-    if (is.function(lab_fun)) counts_tbl$label <- lab_fun(counts_tbl$label)
-    set_labels$data <- counts_tbl
-    p <- p + set_labels
-  }
-
+  ## Optionally modify the theme
   if (length(thm) & is.list(thm)) {
     valid <- intersect(names(thm), names(formals(theme)))
     p <- p + do.call("theme", thm[valid])
@@ -412,7 +403,6 @@ simpleUpSet <- function(
   sets[has_non_zero]
 }
 
-
 #' @keywords internal
 #' @importFrom dplyr if_any summarise left_join
 #' @importFrom tidyselect all_of
@@ -442,6 +432,21 @@ simpleUpSet <- function(
   ## Return the original table with intersect numbers & logical columns
   left_join(x, set_tbl, by = sets)
 
+}
+
+#' @keywords internal
+#' @import ggplot2
+.bg_stripes <- function(sets, stripe_colours){
+  if (is.null(stripe_colours)) return(NULL)
+  stripe_tbl <- data.frame(
+    set = factor(sets, levels = sets),
+    xmin = -Inf, xmax = Inf,
+    col = rep_len(stripe_colours, length(sets))
+  )
+  geom_rect(
+    mapping = aes(xmin = !!sym("xmin"), xmax = !!sym("xmax"), y = set),
+    data = stripe_tbl, height = 1, fill = stripe_tbl$col, inherit.aes = FALSE
+  )
 }
 
 ## Key options to develop
