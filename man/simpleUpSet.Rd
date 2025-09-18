@@ -51,7 +51,7 @@ simpleUpSet(
 
 \item{min_size}{Only show intersections larger than this value}
 
-\item{comma}{logical(1) Add commas to intersection and set labels}
+\item{comma}{logical(1) Add commas to intersection and set totals}
 
 \item{geom_intersect, geom_sets}{Default geoms passed to intersections and
 sets. Can only be \code{\link[ggplot2:geom_bar]{ggplot2::geom_bar()}}, but can be modified as needed}
@@ -103,7 +103,8 @@ Make simple UpSet plots using ggplot2 and patchwork
 \details{
 Taking a subset of columns from a data.frame, create an UpSet plot showing
 all intersections as specified.
-Selected columns must contain logical values or be strictly 0/1 values.
+Columns chosen for the sets and intersections must contain logical values
+or be strictly 0/1 values.
 
 Additional columns can be used where appropriate for creating boxplots etc.
 Internally, data objects will have the variables \code{set} and \code{intersect} which
@@ -140,7 +141,7 @@ simpleUpSet(
     legend.position.inside = c(0.99, 0.99),
     legend.justification.inside = c(1, 1)
   ),
- thm_sets = list(legend.position = "none")
+ thm_sets = theme(legend.position = "none")
 )
 
 ## Add a simple boxplot as an additional upper panel

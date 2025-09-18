@@ -5,7 +5,8 @@
 #' @details
 #' Taking a subset of columns from a data.frame, create an UpSet plot showing
 #' all intersections as specified.
-#' Selected columns must contain logical values or be strictly 0/1 values.
+#' Columns chosen for the sets and intersections must contain logical values
+#' or be strictly 0/1 values.
 #'
 #' Additional columns can be used where appropriate for creating boxplots etc.
 #' Internally, data objects will have the variables `set` and `intersect` which
@@ -20,7 +21,7 @@
 #' @param sort_intersect Show intersections in decreasing order
 #' @param n_intersect Maximum number of intersections to show
 #' @param min_size Only show intersections larger than this value
-#' @param comma logical(1) Add commas to intersection and set labels
+#' @param comma logical(1) Add commas to intersection and set totals
 #' @param geom_intersect,geom_sets Default geoms passed to intersections and
 #' sets. Can only be [geom_bar()], but can be modified as needed
 #' @param annotations list where each element is a list of ggplot2 layers.
@@ -80,7 +81,7 @@
 #'     legend.position.inside = c(0.99, 0.99),
 #'     legend.justification.inside = c(1, 1)
 #'   ),
-#'  thm_sets = list(legend.position = "none")
+#'  thm_sets = theme(legend.position = "none")
 #' )
 #'
 #' ## Add a simple boxplot as an additional upper panel
