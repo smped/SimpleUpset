@@ -49,15 +49,6 @@ simpleUpSet(
 ) &
   theme(legend.position = "bottom")
 
-set_cols <- c("darkred", "forestgreen", "blue", "blue", "blue")
-names(set_cols) <- sets
-simpleUpSet(
-  movies, sets,
-  geom_sets = geom_bar(aes(fill = set)),
-  scale_fill_sets = scale_fill_manual(values = set_cols),
-  thm_sets = theme(legend.position = "none")
-)
-
 ## Modify the grid
 simpleUpSet(
   movies, sets,
@@ -65,3 +56,17 @@ simpleUpSet(
   empty_intersect_points = geom_point(shape = 15, size = 5, colour = "navyblue", alpha = 0.2),
   intersect_segments = geom_segment(colour = "navyblue")
 )
+
+## Test Highlighting
+set_cols <- c(Action = "red", Comedy = "grey30", Drama = "red", Romance = "grey30", Thriller = "grey30")
+simpleUpSet(
+  movies, sets, min_size = 20,
+  geom_sets = geom_bar(aes(fill = set)),
+  geom_intersect = geom_bar(aes(fill = highlight)),
+  highlight = case_when(Action & Drama ~ TRUE),
+  scale_fill_sets = scale_fill_manual(values = set_cols),
+  scale_fill_intersect = scale_fill_manual(values = "red", na.value = "grey30"),
+  scale_grid_fill = scale_fill_manual(values = "red", na.value = "grey30"),
+  intersect_points = geom_point(aes(fill = highlight), size = 4, shape = 21),
+) &
+  theme(legend.position = "none")

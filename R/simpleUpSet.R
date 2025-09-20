@@ -33,8 +33,12 @@
 #' @param intersect_points,intersect_segments,empty_intersect_points
 #' Specifications of [geom_point()] and [geom_segment()]
 #' which can be used to modify the defaults in the matrix panel intersection labels
-#' @param scale_fill_sets,scale_fill_intersect Discrete scales to use when
-#' optionally filling bars by an additional column in 'x'
+#' @param highlight [case_when()] statement defining all intersections to
+#' highlight using `geom_intersect` and `scale_fill/colour_intersect`.
+#' Will add a column named `highlight` which can be called from any geom
+#' @param scale_fill_sets,scale_fill_intersect,scale_colour_sets,scale_colour_intersect
+#' Discrete scales to use when optionally filling or outlining bars by an
+#' additional column in 'x'
 #' @param scale_x_sets,scale_y_intersect Optional scales to pass to these plots.
 #' Can be used to over-ride default axis names, labelling and expansions
 #' @param scale_grid_colour,scale_grid_fill Colour scales passed to all points
@@ -119,6 +123,7 @@
 #'
 #' @import patchwork
 #' @import ggplot2
+#' @importFrom rlang enquo
 #' @export
 simpleUpSet <- function(
     x,
@@ -131,10 +136,13 @@ simpleUpSet <- function(
     intersect_points = geom_point(size = 4, shape = 19),
     intersect_segments = geom_segment(),
     empty_intersect_points = geom_point(size = 4, shape = 19, colour = "grey70"),
+    highlight = NULL,
     scale_x_sets =  scale_x_reverse(name = "Set Size"),
     scale_y_intersect = scale_y_continuous(name = "Intersection Size"),
     scale_fill_sets = scale_fill_discrete(),
+    scale_colour_sets = scale_colour_discrete(),
     scale_fill_intersect = scale_fill_discrete(),
+    scale_colour_intersect = scale_colour_discrete(),
     scale_grid_colour = scale_colour_discrete(),
     scale_grid_fill = scale_fill_discrete(),
     annotations = list(),
@@ -150,12 +158,15 @@ simpleUpSet <- function(
   stopifnot(all(c(width, height) < 1))
 
   ## Get intersections table
-  intersect_tbl <- .add_intersections(x, sets, sort_intersect, na.rm)
+  intersect_tbl <- .add_intersections(
+    x, sets, sort_intersect, na.rm, enquo(highlight)
+  )
+
 
   ## Sets panel
   p_sets <- .plot_sets(
     intersect_tbl, sets, sort_sets, set_labels, scale_x_sets, comma, geom_sets,
-    scale_fill_sets, thm_sets, stripe_colours
+    scale_fill_sets, scale_colour_sets, thm_sets, stripe_colours
   )
 
   ## Intersections panel
@@ -163,7 +174,8 @@ simpleUpSet <- function(
   vjust <- max(nchar(sets)) * vjust_ylab ## Place labels closer to y
   p_int <- .plot_intersect(
     intersect_tbl, min_size, geom_intersect, scale_y_intersect,
-    intersect_labels, comma, scale_fill_intersect, vjust, thm_intersect
+    intersect_labels, comma, scale_fill_intersect, scale_colour_intersect,
+    vjust, thm_intersect
   )
 
   ## Intersections matrix
@@ -249,7 +261,9 @@ simpleUpSet <- function(
 
   sets <-levels(p_sets@data$set)
   ## The grid tbl will contain all intersections
-  grid_tbl <- distinct(p_int@data, !!!syms(c(sets, "intersect")))
+  df <- p_int@data
+  groups <- intersect(c(sets, "intersect", "highlight"), colnames(df))
+  grid_tbl <- distinct(df, !!!syms(groups))
   grid_tbl <- pivot_longer(
     grid_tbl, all_of(sets), names_to = "set", values_to = "in_group"
   )
@@ -309,7 +323,7 @@ simpleUpSet <- function(
 #' @keywords internal
 .plot_intersect <- function(
     tbl, min_size, intersect_geom, y_scale, label_geom, use_comma,
-    fill_scale, vj, thm
+    fill_scale, colour_scale, vj, thm
 ){
 
   stopifnot(is(intersect_geom$geom, "GeomBar"))
@@ -319,6 +333,7 @@ simpleUpSet <- function(
   if (is_waiver(y_scale$expand)) y_scale$expand <- c(0, 0, 0.05, 0)
   ## The default fill scale. Will be ignored if no fill value is passed
   stopifnot(is(fill_scale, "ScaleDiscrete") & fill_scale$aesthetics == "fill")
+  stopifnot(is(colour_scale, "ScaleDiscrete") & colour_scale$aesthetics == "colour")
 
   ## The totals summarised by intersect (ignoring any fill columns)
   totals_df <- summarise(tbl, n = dplyr::n(), .by = all_of("intersect"))
@@ -328,7 +343,7 @@ simpleUpSet <- function(
 
   ## The intial plot
   p <- ggplot(tbl, aes(x = intersect)) +
-    intersect_geom + fill_scale + y_scale +
+    intersect_geom + colour_scale + fill_scale + y_scale +
     scale_x_discrete(name = NULL, labels = NULL) +
     theme(
       axis.title.y = element_text(vjust = -vj),
@@ -360,8 +375,8 @@ simpleUpSet <- function(
 #' @import ggplot2
 #' @keywords internal
 .plot_sets <- function(
-    tbl, sets, sort, set_labels, x_scale, use_comma, sets_geom, fill_scale, thm,
-    stripe_colours
+    tbl, sets, sort, set_labels, x_scale, use_comma, sets_geom, fill_scale,
+    colour_scale, thm, stripe_colours
 ){
 
   ## Get the set levels
@@ -377,6 +392,9 @@ simpleUpSet <- function(
   ## The default fill_scale
   stopifnot(
     is(fill_scale, "ScaleDiscrete") & fill_scale$aesthetics ==  "fill"
+  )
+  stopifnot(
+    is(colour_scale, "ScaleDiscrete") & colour_scale$aesthetics ==  "colour"
   )
   stopifnot(is(sets_geom$geom, "GeomBar"))
 
@@ -402,7 +420,8 @@ simpleUpSet <- function(
   ## The main plot
   stripe_geom <- .bg_stripes(set_levels, stripe_colours)
   p <- ggplot(sets_tbl, aes(y = set)) +
-    stripe_geom + sets_geom + set_labels + fill_scale + x_scale +
+    stripe_geom + sets_geom + set_labels +
+    colour_scale + fill_scale + x_scale +
     scale_y_discrete(position = "right", name = NULL, labels = NULL) +
     theme(
       axis.text.y.right = element_text(hjust = 0.5),
@@ -442,14 +461,18 @@ simpleUpSet <- function(
 }
 
 #' @keywords internal
-#' @importFrom dplyr if_any summarise left_join
+#' @importFrom dplyr if_any summarise left_join mutate
+#' @importFrom rlang quo_is_missing !!
 #' @importFrom tidyselect all_of
-.add_intersections <- function(x, sets, sort, na.rm){
+.add_intersections <- function(x, sets, sort, na.rm, hl){
+
 
   ## Coerce all set columns to be logical & remove rows where all are FALSE
   x[sets] <- lapply(x[sets], as.logical)
   x <- dplyr::filter(x, if_any(all_of(sets)))
   x <- droplevels(x)
+  ## Add highlights if supplied
+  if (!quo_is_missing(hl)) x <- mutate(x, highlight = !!hl)
 
   ## Determine the intersect number to a column in the original
   set_tbl <- summarise(x, n = dplyr::n(), .by = c(all_of(sets)))

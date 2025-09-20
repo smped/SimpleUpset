@@ -19,10 +19,13 @@ simpleUpSet(
   intersect_points = geom_point(size = 4, shape = 19),
   intersect_segments = geom_segment(),
   empty_intersect_points = geom_point(size = 4, shape = 19, colour = "grey70"),
+  highlight = NULL,
   scale_x_sets = scale_x_reverse(name = "Set Size"),
   scale_y_intersect = scale_y_continuous(name = "Intersection Size"),
   scale_fill_sets = scale_fill_discrete(),
+  scale_colour_sets = scale_colour_discrete(),
   scale_fill_intersect = scale_fill_discrete(),
+  scale_colour_intersect = scale_colour_discrete(),
   scale_grid_colour = scale_colour_discrete(),
   scale_grid_fill = scale_fill_discrete(),
   annotations = list(),
@@ -64,11 +67,15 @@ with arguments set as preferred. Use \code{NULL} to hide set or intersect labels
 \item{intersect_points, intersect_segments, empty_intersect_points}{Specifications of \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} and \code{\link[ggplot2:geom_segment]{ggplot2::geom_segment()}}
 which can be used to modify the defaults in the matrix panel intersection labels}
 
+\item{highlight}{\code{\link[dplyr:case_when]{dplyr::case_when()}} statement defining all intersections to
+highlight using \code{geom_intersect} and \code{scale_fill/colour_intersect}.
+Will add a column named \code{highlight} which can be called from any geom}
+
 \item{scale_x_sets, scale_y_intersect}{Optional scales to pass to these plots.
 Can be used to over-ride default axis names, labelling and expansions}
 
-\item{scale_fill_sets, scale_fill_intersect}{Discrete scales to use when
-optionally filling bars by an additional column in 'x'}
+\item{scale_fill_sets, scale_fill_intersect, scale_colour_sets, scale_colour_intersect}{Discrete scales to use when optionally filling or outlining bars by an
+additional column in 'x'}
 
 \item{scale_grid_colour, scale_grid_fill}{Colour scales passed to all points
 and segments in the intersections matrix}
