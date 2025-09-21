@@ -14,11 +14,11 @@ simpleUpSet(
   comma = TRUE,
   geom_intersect = geom_bar(),
   geom_sets = geom_bar(),
-  set_labels = geom_text(hjust = 1.1, size = 3.5),
-  intersect_labels = geom_text(vjust = -0.5, size = 3.5),
-  intersect_points = geom_point(size = 4, shape = 19),
-  intersect_segments = geom_segment(),
-  empty_intersect_points = geom_point(size = 4, shape = 19, colour = "grey70"),
+  geom_set_labels = geom_text(hjust = 1.1, size = 3.5),
+  geom_intersect_labels = geom_text(vjust = -0.5, size = 3.5),
+  grid_points = geom_point(size = 4, shape = 19),
+  grid_segments = geom_segment(),
+  empty_grid_points = geom_point(size = 4, shape = 19, colour = "grey70"),
   highlight = NULL,
   scale_x_sets = scale_x_reverse(name = "Set Size"),
   scale_y_intersect = scale_y_continuous(name = "Intersection Size"),
@@ -26,16 +26,16 @@ simpleUpSet(
   scale_colour_sets = scale_colour_discrete(),
   scale_fill_intersect = scale_fill_discrete(),
   scale_colour_intersect = scale_colour_discrete(),
-  scale_grid_colour = scale_colour_discrete(),
-  scale_grid_fill = scale_fill_discrete(),
+  scale_colour_grid = scale_colour_discrete(),
+  scale_fill_grid = scale_fill_discrete(),
   annotations = list(),
   width = 0.75,
   height = 0.75,
   vjust_ylab = 0.8,
   stripe_colours = c("grey90", "white"),
-  thm_intersect = NULL,
-  thm_sets = NULL,
-  thm_grid = NULL,
+  theme_intersect = NULL,
+  theme_sets = NULL,
+  theme_grid = NULL,
   grid_x_title = NULL,
   guides = "keep",
   top_left = NULL,
@@ -61,10 +61,10 @@ simpleUpSet(
 \item{geom_intersect, geom_sets}{Default geoms passed to intersections and
 sets. Can only be \code{\link[ggplot2:geom_bar]{ggplot2::geom_bar()}}, but can be modified as needed}
 
-\item{set_labels, intersect_labels}{One of \code{\link[ggplot2:geom_text]{ggplot2::geom_text()}} or \code{\link[ggplot2:geom_text]{ggplot2::geom_label()}}
+\item{geom_set_labels, geom_intersect_labels}{One of \code{\link[ggplot2:geom_text]{ggplot2::geom_text()}} or \code{\link[ggplot2:geom_text]{ggplot2::geom_label()}}
 with arguments set as preferred. Use \code{NULL} to hide set or intersect labels}
 
-\item{intersect_points, intersect_segments, empty_intersect_points}{Specifications of \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} and \code{\link[ggplot2:geom_segment]{ggplot2::geom_segment()}}
+\item{grid_points, grid_segments, empty_grid_points}{Specifications of \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} and \code{\link[ggplot2:geom_segment]{ggplot2::geom_segment()}}
 which can be used to modify the defaults in the matrix panel intersection labels}
 
 \item{highlight}{\code{\link[dplyr:case_when]{dplyr::case_when()}} statement defining all intersections to
@@ -77,7 +77,7 @@ Can be used to over-ride default axis names, labelling and expansions}
 \item{scale_fill_sets, scale_fill_intersect, scale_colour_sets, scale_colour_intersect}{Discrete scales to use when optionally filling or outlining bars by an
 additional column in 'x'}
 
-\item{scale_grid_colour, scale_grid_fill}{Colour scales passed to all points
+\item{scale_colour_grid, scale_fill_grid}{Colour scales passed to all points
 and segments in the intersections matrix}
 
 \item{annotations}{list where each element is a list of ggplot2 layers.
@@ -92,7 +92,7 @@ passed with the exception of facets.}
 \item{stripe_colours}{Colours for background stripes in the lower two panels.
 For no stripes, set as NULL}
 
-\item{thm_intersect, thm_sets, thm_grid}{list objects containing
+\item{theme_intersect, theme_sets, theme_grid}{list objects containing
 additional theme arguments for each panel}
 
 \item{grid_x_title}{Optional axis title for the intersections matrix}
@@ -148,12 +148,12 @@ simpleUpSet(
   geom_sets = geom_bar(aes(fill = Decade)),
   scale_fill_intersect = scale_fill_brewer(palette = "Paired"),
   scale_fill_sets = scale_fill_brewer(palette = "Paired"),
-  thm_intersect = theme(
+  theme_intersect = theme(
     legend.position = "inside",
     legend.position.inside = c(0.99, 0.99),
     legend.justification.inside = c(1, 1)
   ),
- thm_sets = theme(legend.position = "none")
+ theme_sets = theme(legend.position = "none")
 )
 
 ## Add a simple boxplot as an additional upper panel
@@ -184,7 +184,7 @@ simpleUpSet(
   movies, sets,
   geom_sets = geom_bar(aes(fill = set)),
   scale_fill_sets = scale_fill_manual(values = set_cols),
-  thm_sets = theme(legend.position = "none")
+  theme_sets = theme(legend.position = "none")
 )
 
 }

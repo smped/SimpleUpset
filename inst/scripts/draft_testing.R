@@ -20,12 +20,12 @@ simpleUpSet(
   geom_sets = geom_bar(aes(fill = Decade)),
   scale_fill_intersect = scale_fill_brewer(palette = "Paired"),
   scale_fill_sets = scale_fill_brewer(palette = "Paired"),
-  thm_intersect = theme(
+  theme_intersect = theme(
     legend.position = "inside",
     legend.position.inside = c(0.99, 0.99),
     legend.justification.inside = c(1, 1)
   ),
-  thm_sets = theme(legend.position = "none")
+  theme_sets = theme(legend.position = "none")
 )
 
 ## Add a simple boxplot
@@ -52,9 +52,9 @@ simpleUpSet(
 ## Modify the grid
 simpleUpSet(
   movies, sets,
-  intersect_points = geom_point(shape = 15, size = 5, colour = "navyblue"),
-  empty_intersect_points = geom_point(shape = 15, size = 5, colour = "navyblue", alpha = 0.2),
-  intersect_segments = geom_segment(colour = "navyblue")
+  grid_points = geom_point(shape = 15, size = 5, colour = "navyblue"),
+  empty_grid_points = geom_point(shape = 15, size = 5, colour = "navyblue", alpha = 0.2),
+  grid_segments = geom_segment(colour = "navyblue")
 )
 
 ## Test Highlighting
@@ -67,6 +67,7 @@ simpleUpSet(
   scale_fill_sets = scale_fill_manual(values = set_cols),
   scale_fill_intersect = scale_fill_manual(values = "red", na.value = "grey30"),
   scale_grid_fill = scale_fill_manual(values = "red", na.value = "grey30"),
-  intersect_points = geom_point(aes(fill = highlight), size = 4, shape = 21),
+  grid_points = geom_point(aes(fill = highlight), size = 4, shape = 21),
 ) &
-  theme(legend.position = "none")
+  plot_annotation(title = "Using Highlights") &
+  theme(legend.position = "none", plot.title = element_text(hjust = 2/3))

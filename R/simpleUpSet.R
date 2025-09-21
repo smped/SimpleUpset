@@ -28,9 +28,9 @@
 #' Each element will be added as an upper annotation panel above the
 #' intersections plot. All layer types (geom, scale, aes, stat, labs etc) can be
 #' passed with the exception of facets.
-#' @param set_labels,intersect_labels One of [geom_text()] or [geom_label()]
+#' @param geom_set_labels,geom_intersect_labels One of [geom_text()] or [geom_label()]
 #' with arguments set as preferred. Use `NULL` to hide set or intersect labels
-#' @param intersect_points,intersect_segments,empty_intersect_points
+#' @param grid_points,grid_segments,empty_grid_points
 #' Specifications of [geom_point()] and [geom_segment()]
 #' which can be used to modify the defaults in the matrix panel intersection labels
 #' @param highlight [case_when()] statement defining all intersections to
@@ -41,13 +41,13 @@
 #' additional column in 'x'
 #' @param scale_x_sets,scale_y_intersect Optional scales to pass to these plots.
 #' Can be used to over-ride default axis names, labelling and expansions
-#' @param scale_grid_colour,scale_grid_fill Colour scales passed to all points
+#' @param scale_colour_grid,scale_fill_grid Colour scales passed to all points
 #' and segments in the intersections matrix
 #' @param width,height Proportional width and height of the intersection panel
 #' @param stripe_colours Colours for background stripes in the lower two panels.
 #' For no stripes, set as NULL
 #' @param vjust_ylab Used to nudge the y-axis labels closer to the axis
-#' @param thm_intersect,thm_sets,thm_grid list objects containing
+#' @param theme_intersect,theme_sets,theme_grid list objects containing
 #' additional theme arguments for each panel
 #' @param guides Passed to [plot_layout()]
 #' @param top_left Optional ggplot object to show in the top left panel. Will
@@ -82,12 +82,12 @@
 #'   geom_sets = geom_bar(aes(fill = Decade)),
 #'   scale_fill_intersect = scale_fill_brewer(palette = "Paired"),
 #'   scale_fill_sets = scale_fill_brewer(palette = "Paired"),
-#'   thm_intersect = theme(
+#'   theme_intersect = theme(
 #'     legend.position = "inside",
 #'     legend.position.inside = c(0.99, 0.99),
 #'     legend.justification.inside = c(1, 1)
 #'   ),
-#'  thm_sets = theme(legend.position = "none")
+#'  theme_sets = theme(legend.position = "none")
 #' )
 #'
 #' ## Add a simple boxplot as an additional upper panel
@@ -118,7 +118,7 @@
 #'   movies, sets,
 #'   geom_sets = geom_bar(aes(fill = set)),
 #'   scale_fill_sets = scale_fill_manual(values = set_cols),
-#'   thm_sets = theme(legend.position = "none")
+#'   theme_sets = theme(legend.position = "none")
 #' )
 #'
 #' @import patchwork
@@ -131,11 +131,11 @@ simpleUpSet <- function(
     n_intersect = 20, min_size = 0, comma = TRUE,
     geom_intersect = geom_bar(),
     geom_sets = geom_bar(),
-    set_labels = geom_text(hjust = 1.1, size = 3.5),
-    intersect_labels = geom_text(vjust = -0.5, size = 3.5),
-    intersect_points = geom_point(size = 4, shape = 19),
-    intersect_segments = geom_segment(),
-    empty_intersect_points = geom_point(size = 4, shape = 19, colour = "grey70"),
+    geom_set_labels = geom_text(hjust = 1.1, size = 3.5),
+    geom_intersect_labels = geom_text(vjust = -0.5, size = 3.5),
+    grid_points = geom_point(size = 4, shape = 19),
+    grid_segments = geom_segment(),
+    empty_grid_points = geom_point(size = 4, shape = 19, colour = "grey70"),
     highlight = NULL,
     scale_x_sets =  scale_x_reverse(name = "Set Size"),
     scale_y_intersect = scale_y_continuous(name = "Intersection Size"),
@@ -143,12 +143,12 @@ simpleUpSet <- function(
     scale_colour_sets = scale_colour_discrete(),
     scale_fill_intersect = scale_fill_discrete(),
     scale_colour_intersect = scale_colour_discrete(),
-    scale_grid_colour = scale_colour_discrete(),
-    scale_grid_fill = scale_fill_discrete(),
+    scale_colour_grid = scale_colour_discrete(),
+    scale_fill_grid = scale_fill_discrete(),
     annotations = list(),
     width = 0.75, height = 0.75, vjust_ylab = 0.8,
     stripe_colours = c("grey90", "white"),
-    thm_intersect = NULL, thm_sets = NULL, thm_grid = NULL,
+    theme_intersect = NULL, theme_sets = NULL, theme_grid = NULL,
     grid_x_title = NULL, guides = "keep", top_left = NULL,
     ..., na.rm = TRUE
 ){
@@ -165,8 +165,8 @@ simpleUpSet <- function(
 
   ## Sets panel
   p_sets <- .plot_sets(
-    intersect_tbl, sets, sort_sets, set_labels, scale_x_sets, comma, geom_sets,
-    scale_fill_sets, scale_colour_sets, thm_sets, stripe_colours
+    intersect_tbl, sets, sort_sets, geom_set_labels, scale_x_sets, comma, geom_sets,
+    scale_fill_sets, scale_colour_sets, theme_sets, stripe_colours
   )
 
   ## Intersections panel
@@ -174,16 +174,16 @@ simpleUpSet <- function(
   vjust <- max(nchar(sets)) * vjust_ylab ## Place labels closer to y
   p_int <- .plot_intersect(
     intersect_tbl, min_size, geom_intersect, scale_y_intersect,
-    intersect_labels, comma, scale_fill_intersect, scale_colour_intersect,
-    vjust, thm_intersect
+    geom_intersect_labels, comma, scale_fill_intersect, scale_colour_intersect,
+    vjust, theme_intersect
   )
 
   ## Intersections matrix
   keep_intersect <- droplevels(p_int@data$intersect)
   intersect_tbl <- dplyr::filter(intersect_tbl, intersect %in% keep_intersect)
   p_mat <- .plot_grid(
-    p_int, p_sets, intersect_points, intersect_segments, thm_grid, grid_x_title,
-    stripe_colours, empty_intersect_points, scale_grid_colour, scale_grid_fill
+    p_int, p_sets, grid_points, grid_segments, theme_grid, grid_x_title,
+    stripe_colours, empty_grid_points, scale_colour_grid, scale_fill_grid
   )
 
   ## Blank plot
@@ -375,7 +375,7 @@ simpleUpSet <- function(
 #' @import ggplot2
 #' @keywords internal
 .plot_sets <- function(
-    tbl, sets, sort, set_labels, x_scale, use_comma, sets_geom, fill_scale,
+    tbl, sets, sort, geom_set_labels, x_scale, use_comma, sets_geom, fill_scale,
     colour_scale, thm, stripe_colours
 ){
 
@@ -398,7 +398,7 @@ simpleUpSet <- function(
   )
   stopifnot(is(sets_geom$geom, "GeomBar"))
 
-  if (!is.null(set_labels)) {
+  if (!is.null(geom_set_labels)) {
     ## Setup the labels for plotting using colSums
     counts_tbl <- data.frame(
       set = factor(names(col_sums), levels = set_levels), n = col_sums
@@ -407,9 +407,9 @@ simpleUpSet <- function(
     if (use_comma) counts_tbl$label <- comma(counts_tbl$label)
 
     ## This should be a geom_text/label instance set in the initial arguments
-    stopifnot(is(set_labels$geom) %in% c("GeomLabel", "GeomText"))
-    set_labels$mapping <- aes(x = n, y = set, label = label)
-    set_labels$data <- counts_tbl
+    stopifnot(is(geom_set_labels$geom) %in% c("GeomLabel", "GeomText"))
+    geom_set_labels$mapping <- aes(x = n, y = set, label = label)
+    geom_set_labels$data <- counts_tbl
     ## Expand x based on the maximum value. Might go weird if transforming
   }
 
@@ -420,7 +420,7 @@ simpleUpSet <- function(
   ## The main plot
   stripe_geom <- .bg_stripes(set_levels, stripe_colours)
   p <- ggplot(sets_tbl, aes(y = set)) +
-    stripe_geom + sets_geom + set_labels +
+    stripe_geom + sets_geom + geom_set_labels +
     colour_scale + fill_scale + x_scale +
     scale_y_discrete(position = "right", name = NULL, labels = NULL) +
     theme(
