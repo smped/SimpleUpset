@@ -452,7 +452,7 @@ simpleUpSet <- function(
   ## Check each column only has 0,1 entries
   is_lgl <- vapply(x[sets], \(x) all(x %in% c(0, 1, NA)), logical(1))
   if (!all(is_lgl)) stop(
-    names(which(!is_lgl)), "are logical or strictly in 0,1"
+    "Column(s) ", names(which(!is_lgl)), " not logical or strictly in 0,1"
   )
   ## Check for non-zero values in at least one position
   ## Drop these from the sets going forward
