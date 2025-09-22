@@ -11,21 +11,24 @@ movies <- readr::read_delim(system.file("extdata", "movies.csv", package = "UpSe
 sets <- c("Action", "Comedy", "Drama", "Thriller", "Romance")
 
 ## Basic
-simpleUpSet(movies, sets, comma = FALSE)
+simpleUpSet(movies, sets)
 
 ## Fill with fewer intersects
 simpleUpSet(
   movies, sets, min_size = 20,
-  geom_intersect = geom_bar(aes(fill = Decade)),
-  geom_sets = geom_bar(aes(fill = Decade)),
-  scale_fill_intersect = scale_fill_brewer(palette = "Paired"),
-  scale_fill_sets = scale_fill_brewer(palette = "Paired"),
-  theme_intersect = theme(
-    legend.position = "inside",
-    legend.position.inside = c(0.99, 0.99),
-    legend.justification.inside = c(1, 1)
+  intersect_layers = default_intersect_layers(
+    fill = "Decade",
+    scale_fill_brewer(palette = "Paired"),
+    theme(
+      legend.position = "inside",
+      legend.position.inside = c(0.99, 0.99),
+      legend.justification.inside = c(1, 1)
+    )
   ),
-  theme_sets = theme(legend.position = "none")
+  set_layers = default_set_layers(
+    fill = "Decade", scale_fill_brewer(palette = "Paired"),
+    guides(fill = guide_none())
+  )
 )
 
 ## Add a simple boxplot
@@ -49,25 +52,16 @@ simpleUpSet(
 ) &
   theme(legend.position = "bottom")
 
-## Modify the grid
-simpleUpSet(
-  movies, sets,
-  grid_points = geom_point(shape = 15, size = 5, colour = "navyblue"),
-  empty_grid_points = geom_point(shape = 15, size = 5, colour = "navyblue", alpha = 0.2),
-  grid_segments = geom_segment(colour = "navyblue")
-)
 
 ## Test Highlighting
-set_cols <- c(Action = "red", Comedy = "grey30", Drama = "red", Romance = "grey30", Thriller = "grey30")
+set_cols <- c(Action = "red", Comedy = "grey23", Drama = "red", Romance = "grey23", Thriller = "grey23")
 simpleUpSet(
   movies, sets, min_size = 20,
-  geom_sets = geom_bar(aes(fill = set)),
-  geom_intersect = geom_bar(aes(fill = highlight)),
-  highlight = case_when(Action & Drama ~ TRUE),
-  scale_fill_sets = scale_fill_manual(values = set_cols),
-  scale_fill_intersect = scale_fill_manual(values = "red", na.value = "grey30"),
-  scale_grid_fill = scale_fill_manual(values = "red", na.value = "grey30"),
-  grid_points = geom_point(aes(fill = highlight), size = 4, shape = 21),
+  set_layers = default_set_layers(fill = "set", scale_fill_manual(values = set_cols)),
+  intersect_layers = default_intersect_layers(fill = "highlight", scale_fill_manual(values = "red", na.value = "grey23")),
+  grid_layers = default_grid_layers(colour = "highlight", scale_colour_manual(values = "red", na.value = "grey23")),
+  highlight = case_when(Action & Drama ~ TRUE)
+
 ) &
   plot_annotation(title = "Using Highlights") &
   theme(legend.position = "none", plot.title = element_text(hjust = 2/3))

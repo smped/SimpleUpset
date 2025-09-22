@@ -11,32 +11,15 @@ simpleUpSet(
   sort_intersect = TRUE,
   n_intersect = 20,
   min_size = 0,
-  comma = TRUE,
-  geom_intersect = geom_bar(),
-  geom_sets = geom_bar(),
-  geom_set_labels = geom_text(hjust = 1.1, size = 3.5),
-  geom_intersect_labels = geom_text(vjust = -0.5, size = 3.5),
-  grid_points = geom_point(size = 4, shape = 19),
-  grid_segments = geom_segment(),
-  empty_grid_points = geom_point(size = 4, shape = 19, colour = "grey70"),
+  set_layers = default_set_layers(),
+  intersect_layers = default_intersect_layers(),
+  grid_layers = default_grid_layers(),
   highlight = NULL,
-  scale_x_sets = scale_x_reverse(name = "Set Size"),
-  scale_y_intersect = scale_y_continuous(name = "Intersection Size"),
-  scale_fill_sets = scale_fill_discrete(),
-  scale_colour_sets = scale_colour_discrete(),
-  scale_fill_intersect = scale_fill_discrete(),
-  scale_colour_intersect = scale_colour_discrete(),
-  scale_colour_grid = scale_colour_discrete(),
-  scale_fill_grid = scale_fill_discrete(),
   annotations = list(),
   width = 0.75,
   height = 0.75,
   vjust_ylab = 0.8,
   stripe_colours = c("grey90", "white"),
-  theme_intersect = NULL,
-  theme_sets = NULL,
-  theme_grid = NULL,
-  grid_x_title = NULL,
   guides = "keep",
   top_left = NULL,
   ...,
@@ -56,29 +39,19 @@ simpleUpSet(
 
 \item{min_size}{Only show intersections larger than this value}
 
-\item{comma}{logical(1) Add commas to intersection and set totals}
+\item{set_layers}{List of \code{ggplot2} layers, scales and themes to define the
+appearance of the sets panel. Can be obtained and extended using
+\code{\link[=default_set_layers]{default_set_layers()}}}
 
-\item{geom_intersect, geom_sets}{Default geoms passed to intersections and
-sets. Can only be \code{\link[ggplot2:geom_bar]{ggplot2::geom_bar()}}, but can be modified as needed}
+\item{intersect_layers}{List of \code{ggplot2} layers, scales and themes to define
+the appearance of the intersections panel. Can be obtained and extended
+using \code{\link[=default_intersect_layers]{default_intersect_layers()}}}
 
-\item{geom_set_labels, geom_intersect_labels}{One of \code{\link[ggplot2:geom_text]{ggplot2::geom_text()}} or \code{\link[ggplot2:geom_text]{ggplot2::geom_label()}}
-with arguments set as preferred. Use \code{NULL} to hide set or intersect labels}
-
-\item{grid_points, grid_segments, empty_grid_points}{Specifications of \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} and \code{\link[ggplot2:geom_segment]{ggplot2::geom_segment()}}
-which can be used to modify the defaults in the matrix panel intersection labels}
+\item{grid_layers}{List of \code{ggplot2} layers, scales & themes}
 
 \item{highlight}{\code{\link[dplyr:case_when]{dplyr::case_when()}} statement defining all intersections to
 highlight using \code{geom_intersect} and \code{scale_fill/colour_intersect}.
 Will add a column named \code{highlight} which can be called from any geom}
-
-\item{scale_x_sets, scale_y_intersect}{Optional scales to pass to these plots.
-Can be used to over-ride default axis names, labelling and expansions}
-
-\item{scale_fill_sets, scale_fill_intersect, scale_colour_sets, scale_colour_intersect}{Discrete scales to use when optionally filling or outlining bars by an
-additional column in 'x'}
-
-\item{scale_colour_grid, scale_fill_grid}{Colour scales passed to all points
-and segments in the intersections matrix}
 
 \item{annotations}{list where each element is a list of ggplot2 layers.
 Each element will be added as an upper annotation panel above the
@@ -91,11 +64,6 @@ passed with the exception of facets.}
 
 \item{stripe_colours}{Colours for background stripes in the lower two panels.
 For no stripes, set as NULL}
-
-\item{theme_intersect, theme_sets, theme_grid}{list objects containing
-additional theme arguments for each panel}
-
-\item{grid_x_title}{Optional axis title for the intersections matrix}
 
 \item{guides}{Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
 
