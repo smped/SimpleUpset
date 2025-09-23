@@ -217,6 +217,12 @@ simpleUpSet <- function(
 #' .plot_grid(p_int, p_sets, grid_points, grid_layers, stripe_colours)
 .plot_grid <- function(p_int, p_sets, layers, stripe_colours){
 
+  ## Check the layers
+  if (!is(layers, "default_layers")) {
+    is_gg <- vapply(layers, .check_gg_layers, logical(1))
+    stopifnot(all(is_gg))
+  }
+
   sets <-levels(p_sets@data$set)
   ## The grid tbl will contain all intersections
   df <- p_int@data
@@ -270,8 +276,12 @@ simpleUpSet <- function(
 #' @importFrom methods is
 #' @import ggplot2
 #' @keywords internal
-#' .plot_intersect(intersect_tbl, min_size, intersect_layers, vjust)
 .plot_intersect <- function(tbl, min_size, layers, vj){
+
+  if (!is(layers, "default_layers")) {
+    is_gg <- vapply(layers, .check_gg_layers, logical(1))
+    stopifnot(all(is_gg))
+  }
 
   ## The totals summarised by intersect (ignoring any fill columns)
   totals_df <- summarise(tbl, n = dplyr::n(), .by = all_of("intersect"))
@@ -301,9 +311,16 @@ simpleUpSet <- function(
 
 #' @importFrom dplyr across summarise
 #' @importFrom tidyr pivot_longer
+#' @importFrom methods is
 #' @import ggplot2
 #' @keywords internal
 .plot_sets <- function(tbl, sets, sort, layers, stripe_colours){
+
+  ## Check the layers
+  if (!is(layers, "default_layers")) {
+    is_gg <- vapply(layers, .check_gg_layers, logical(1))
+    stopifnot(all(is_gg))
+  }
 
   ## Get the set levels
   col_sums <- colSums(tbl[sets])

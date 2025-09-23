@@ -48,12 +48,8 @@ default_set_layers <- function(
     ..., fill = NULL, f = comma, expand = 0.2, name = "Set Size", dry_run = FALSE
 ){
 
-  bar_geom <- geom_bar()
-  if (!is.null(fill)) {
-    if (is.null(bar_geom$mapping)) {
-      bar_geom$mapping <- aes(fill = !!sym(fill))
-    }
-  }
+  bar_aes <- aes()
+  if (!is.null(fill)) bar_aes$fill <- sym(fill)
 
   ## Check the labeller
   if (is.null(f)) f <- c
@@ -67,7 +63,7 @@ default_set_layers <- function(
   layers <- expr(
     list(
       aes(y = set),
-      bar_geom,
+      geom_bar(mapping = bar_aes),
       geom_text(aes(x = n, label = f(n)), hjust = 1.1, size = 3.5),
       scale_x_reverse(expand = c(expand, 0, 0, 0), name = name, labels = f),
       scale_y_discrete(position = "right", name = NULL, labels = NULL),
@@ -79,11 +75,14 @@ default_set_layers <- function(
     )
   )
   if (dry_run) return(layers)
-  c(eval(layers), dot_list)
+  out <- c(eval(layers), dot_list)
+  class(out) <- "default_layers"
+  out
 
 }
 #' @import ggplot2
 #' @importFrom scales comma
+#' @importFrom rlang sym
 #' @export
 #' @rdname default-layers
 default_intersect_layers <- function(
@@ -91,12 +90,8 @@ default_intersect_layers <- function(
     dry_run = FALSE
 ){
 
-  bar_geom <- geom_bar()
-  if (!is.null(fill)) {
-    if (is.null(bar_geom$mapping)) {
-      bar_geom$mapping <- aes(fill = !!sym(fill))
-    }
-  }
+  bar_aes <- aes()
+  if (!is.null(fill)) bar_aes$fill <- sym(fill)
 
   ## Check the labeller
   if (is.null(f)) f <- c
@@ -110,7 +105,7 @@ default_intersect_layers <- function(
   layers <- expr(
     list(
       aes(x = intersect),
-      bar_geom,
+      geom_bar(mapping = bar_aes),
       geom_text(aes(y = n, label = f(n)), vjust = -0.5, size = 3.5),
       scale_x_discrete(name = NULL, labels = NULL),
       scale_y_continuous(name = name, expand = c(0, 0, expand, 0)),
@@ -121,7 +116,9 @@ default_intersect_layers <- function(
     )
   )
   if (dry_run) return(layers)
-  c(eval(layers), dot_list)
+  out <- c(eval(layers), dot_list)
+  class(out) <- "default_layers"
+  out
 
 }
 #' @import ggplot2
@@ -133,25 +130,33 @@ default_grid_layers <- function(
     ..., colour = NULL, fill = NULL, light = "grey80", dark = "grey23", dry_run = FALSE
 ){
 
-  points_geom <- geom_point(size = 4, shape = 19, colour = dark)
-  segment_geom <- geom_segment(
-    aes(y = !!sym("y_min"), yend = !!sym("y_max")), colour = dark
-  )
+  # points_geom <- geom_point(size = 4, shape = 19, colour = dark)
+  # segment_geom <- geom_segment(
+  #   aes(y = !!sym("y_min"), yend = !!sym("y_max")), colour = dark
+  # )
+  # if (!is.null(colour)) {
+  #
+  #   if (is.null(points_geom$mapping)) points_geom$mapping <- aes()
+  #   points_geom$aes_params$colour <- NULL
+  #   points_geom$mapping$colour <- sym(colour)
+  #
+  #   if (is.null(segment_geom$mapping)) segment_geom$mapping <- aes()
+  #   segment_geom$aes_params$colour <- NULL
+  #   segment_geom$mapping$colour <- sym(colour)
+  #
+  # }
+  # if (!is.null(fill)) {
+  #   if (is.null(points_geom$mapping)) points_geom$mapping <- aes()
+  #   points_geom$mapping$fill <- sym(fill)
+  # }
+
+  points_aes <- aes()
+  segment_aes <- aes(y = !!sym("y_min"), yend = !!sym("y_max"))
   if (!is.null(colour)) {
-
-    if (is.null(points_geom$mapping)) points_geom$mapping <- aes()
-    points_geom$aes_params$colour <- NULL
-    points_geom$mapping$colour <- sym(colour)
-
-    if (is.null(segment_geom$mapping)) segment_geom$mapping <- aes()
-    segment_geom$aes_params$colour <- NULL
-    segment_geom$mapping$colour <- sym(colour)
-
+    points_aes$colour <- sym(colour)
+    segment_aes$colour <- sym(colour)
   }
-  if (!is.null(fill)) {
-    if (is.null(points_geom$mapping)) points_geom$mapping <- aes()
-    points_geom$mapping$fill <- sym(fill)
-  }
+  if (!is.null(fill)) points_aes$fill <- sym(fill)
 
   ## Check all dotargs for validity
   dot_list <- list(...)
@@ -161,9 +166,17 @@ default_grid_layers <- function(
   layers <- expr(
     list(
       aes(x = intersect, y = set),
-      points_geom,
+      if (!is.null(colour)) {
+        geom_point(mapping = points_aes, size = 4, shape = 19)
+      } else {
+        geom_point(mapping = points_aes, size = 4, shape = 19, colour = dark)
+      },
       geom_point(size = 4, shape = 19, colour = light), # Empty intersections
-      segment_geom,
+      if (!is.null(colour)) {
+        geom_segment(mapping = segment_aes)
+      } else {
+        geom_segment(mapping = segment_aes, colour = dark)
+      },
       scale_y_discrete(name = NULL),
       scale_x_discrete(name = NULL, labels = NULL),
       guides(colour = guide_none()),
@@ -175,6 +188,8 @@ default_grid_layers <- function(
     )
   )
   if (dry_run) return(layers)
-  c(eval(layers), dot_list)
+  out <- c(eval(layers), dot_list)
+  class(out) <- "default_layers"
+  out
 
 }
