@@ -77,3 +77,8 @@ test_that("Upper Left works as expected", {
   )
 
 })
+test_that("highlights work as expected", {
+  p <- simpleUpSet(movies, sets, highlight = case_when(Action ~TRUE))
+  expect_true("highlight" %in% colnames(p[[2]]@data))
+  expect_error(simpleUpSet(movies, sets, highlight = TRUE), "highlight can only.+")
+})

@@ -8,13 +8,17 @@
 #' Columns chosen for the sets and intersections must contain logical values
 #' or be strictly 0/1 values.
 #'
-#' Additional columns can be used where appropriate for creating boxplots etc.
 #' Internally, data objects will have the variables `set` and `intersect` which
 #' can be referred to when passing custom aes() mappings to various layers.
+#' If specifying highlights, the column `highlight` will also be added as a
+#' column to the data.frame containing intersections data, following the
+#' `case_when` output provided as the argument.
+#' Scales can be passed to the intersections and grid panels, taking this
+#' structure into account.
+#'
 #' Any additional layers passed using `annotations()` will have layers added
 #' after an initial, internal call to `ggplot(data, aes(x = intersect))`.
-#' If specifying highlights, the column `highlight` will also be added as a
-#' column to the data.frame containing intersections data.
+#' Additional columns can be used where appropriate for creating boxplots etc.
 #'
 #' A list of ggplot2 layers, scales, guides and themes is expected in each of
 #' the `set_layers`, `intersect_layers` or `grid_layers` arguments, with
@@ -42,7 +46,8 @@
 #' passed with the exception of facets.
 #' @param highlight [case_when()] statement defining all intersections to
 #' highlight using `geom_intersect` and `scale_fill/colour_intersect`.
-#' Will add a column named `highlight` which can be called from any geom
+#' Will add a column named `highlight` which can be called from any geom passed
+#' to the intersections barplot or matrix
 #' @param width,height Proportional width and height of the intersection panel
 #' @param stripe_colours Colours for background stripes in the lower two panels.
 #' For no stripes, set as NULL
@@ -385,7 +390,7 @@ simpleUpSet <- function(
 
 #' @keywords internal
 #' @importFrom dplyr if_any summarise left_join mutate
-#' @importFrom rlang quo_is_missing !!
+#' @importFrom rlang quo_is_null !!
 #' @importFrom tidyselect all_of
 .add_intersections <- function(x, sets, sort, na.rm, hl){
 
@@ -395,7 +400,11 @@ simpleUpSet <- function(
   x <- dplyr::filter(x, if_any(all_of(sets)))
   x <- droplevels(x)
   ## Add highlights if supplied
-  if (!quo_is_missing(hl)) x <- mutate(x, highlight = !!hl)
+  if (!quo_is_null(hl)) {
+    if (!grepl("^case_when", as_label(hl)))
+      stop("highlight can only be specified as a `case_when() statement")
+    x <- mutate(x, highlight = !!hl)
+  }
 
   ## Determine the intersect number to a column in the original
   set_tbl <- summarise(x, n = dplyr::n(), .by = c(all_of(sets)))

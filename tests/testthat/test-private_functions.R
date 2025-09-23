@@ -1,19 +1,12 @@
 
 test_that(".add_intersections adds & transforms columns", {
-  hl <- case_when(TRUE ~ "check")
-  tbl <- .add_intersections(movies, sets, TRUE, TRUE, enquo(hl))
-  expect_true(all(tbl$highlight == "check"))
-  expect_true(all(vapply(tbl[sets], is.logical, logical(1))))
-  expect_true(
-    all(
-      colnames(tbl) %in% c(colnames(movies), "intersect", "highlight")
-    )
-  )
-
   hl <- NULL
   tbl <- .add_intersections(movies, sets, TRUE, TRUE, enquo(hl))
+  expect_true(all(vapply(tbl[sets], is.logical, logical(1))))
+  expect_true(all(colnames(tbl) %in% c(colnames(movies), "intersect")))
   expect_null(tbl[["highlight"]])
-
+  hl <- ""
+  expect_error(.add_intersections(movies, sets, TRUE, TRUE, hl))
 
 })
 
