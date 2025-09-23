@@ -51,7 +51,8 @@ using \code{\link[=default_intersect_layers]{default_intersect_layers()}}}
 
 \item{highlight}{\code{\link[dplyr:case_when]{dplyr::case_when()}} statement defining all intersections to
 highlight using \code{geom_intersect} and \code{scale_fill/colour_intersect}.
-Will add a column named \code{highlight} which can be called from any geom}
+Will add a column named \code{highlight} which can be called from any geom passed
+to the intersections barplot or matrix}
 
 \item{annotations}{list where each element is a list of ggplot2 layers.
 Each element will be added as an upper annotation panel above the
@@ -86,13 +87,17 @@ all intersections as specified.
 Columns chosen for the sets and intersections must contain logical values
 or be strictly 0/1 values.
 
-Additional columns can be used where appropriate for creating boxplots etc.
 Internally, data objects will have the variables \code{set} and \code{intersect} which
 can be referred to when passing custom aes() mappings to various layers.
+If specifying highlights, the column \code{highlight} will also be added as a
+column to the data.frame containing intersections data, following the
+\code{case_when} output provided as the argument.
+Scales can be passed to the intersections and grid panels, taking this
+structure into account.
+
 Any additional layers passed using \code{annotations()} will have layers added
 after an initial, internal call to \code{ggplot(data, aes(x = intersect))}.
-If specifying highlights, the column \code{highlight} will also be added as a
-column to the data.frame containing intersections data.
+Additional columns can be used where appropriate for creating boxplots etc.
 
 A list of ggplot2 layers, scales, guides and themes is expected in each of
 the \code{set_layers}, \code{intersect_layers} or \code{grid_layers} arguments, with
