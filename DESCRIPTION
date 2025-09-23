@@ -27,6 +27,7 @@ Imports:
 Suggests: 
     knitr,
     pander,
+    pkgdown,
     testthat (>= 3.0.0),
     tidyverse,
     UpSetR
