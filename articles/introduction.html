@@ -167,7 +167,7 @@ logical values, or logical values directly.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Action"</span>, <span class="st">"Comedy"</span>, <span class="st">"Drama"</span>, <span class="st">"Thriller"</span>, <span class="st">"Romance"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/simpleUpSet.html">simpleUpSet</a></span><span class="op">(</span><span class="va">movies</span>, <span class="va">sets</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/simple-upset-1.png" width="768"></p>
+<p><img src="introduction_files/figure-html/simple-upset-1.png" width="960"></p>
 <p>The number of intersections can be controlled using the arguments
 <code>n_intersect</code> to define a maximum number plotted, or
 <code>min_size</code> to only show those greater than any given
@@ -215,7 +215,7 @@ handled simply by the ellipsis (<code>...</code>)</p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_none.html" class="external-link">guide_none</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, expand <span class="op">=</span> <span class="fl">0.3</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/upset-decade-1.png" width="768"></p>
+<p><img src="introduction_files/figure-html/upset-decade-1.png" width="960"></p>
 </div>
 <div class="section level2">
 <h2 id="highlighting-intersections-and-sets">Highlighting Intersections and Sets<a class="anchor" aria-label="anchor" href="#highlighting-intersections-and-sets"></a>
@@ -249,7 +249,7 @@ highlights</p>
 <span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Using Highlights"</span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span>, plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>hjust <span class="op">=</span> <span class="fl">2</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/upset-highlights-1.png" width="768"></p>
+<p><img src="introduction_files/figure-html/upset-highlights-1.png" width="960"></p>
 </div>
 <div class="section level2">
 <h2 id="adding-plots-to-upper-panels">Adding Plots to Upper Panels<a class="anchor" aria-label="anchor" href="#adding-plots-to-upper-panels"></a>
@@ -264,7 +264,7 @@ argument</p>
 <span>  intersect_layers <span class="op">=</span> <span class="fu"><a href="../reference/default-layers.html">default_intersect_layers</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>,</span>
 <span>  annotations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_boxplot.html" class="external-link">geom_boxplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">AvgRating</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/upset-boxplot-1.png" width="768"></p>
+<p><img src="introduction_files/figure-html/upset-boxplot-1.png" width="960"></p>
 <p>There is no particular limit to the complexity of the upper panels,
 beyond what is contained within the dataset, or what can be considered
 as useful for communication with readers</p>
@@ -284,7 +284,7 @@ as useful for communication with readers</p>
 <span>  <span class="op">)</span>, guides <span class="op">=</span> <span class="st">"collect"</span></span>
 <span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/upset-violin-1.png" width="768"></p>
+<p><img src="introduction_files/figure-html/upset-violin-1.png" width="960"></p>
 </div>
 <div class="section level2">
 <h2 id="sessioninfo">SessionInfo<a class="anchor" aria-label="anchor" href="#sessioninfo"></a>
