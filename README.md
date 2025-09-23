@@ -10,5 +10,5 @@
 The package `SimpleUpset` provides the capability for creating UpSet plots, 
 using a combination of `ggplot` and `patchwork` to put the figures together.
 In addition to the simple UpSet plots, additional panels can be added above 
-the intersections to allow more informative plotting
+the intersections to allow more informative plotting.
 
