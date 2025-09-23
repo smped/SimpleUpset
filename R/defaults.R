@@ -4,12 +4,27 @@
 #'
 #' @details
 #' These functions define the default layers for inclusion on UpSet plots.
-#' Given the returned object is a simple list, these are easily modifiable using
-#' simple list operations.
-#' Additional themes, guides, scales etc can be easily added using the dot
-#' arguments.
 #'
-#' The underlying code for simple modification can be obtained using `dry_run = FALSE`
+#' The returned object is a list with a series of layers, scales, themes etc
+#' which represent the default plotting layers for each of the sets,
+#' intersections and intersections matrix (grid) panels.
+#'
+#' A series of common arguments have been defined to enable common modifications
+#' without recreating the list from scratch. These include modifying the mapping
+#' to fill, axis expansion to better accommodate labels, labelling functions for
+#' set/intersection sizes, and axis titles.
+#'
+#' Additional layers, such as scale_fill_* elements, guides or themes, can be
+#' simply included by passing to the function, without any requirement for
+#' naming, and are handled by the ellipsis.
+#'
+#' The entire command used to create default layers can be shown by calling each
+#' function using the argument `dry_run = TRUE`.
+#' This can be helpful for creating custom layers, by starting with then
+#' modifying the defaults.
+#'
+#' The returned object is a simple list, and are easily modifiable using
+#' simple list operations.
 #'
 #' @param fill Column to fill set bars by. Can be 'set' or another column within
 #' the main data object
@@ -25,11 +40,16 @@
 #' included as part of a dry_run
 #' @param light,dark default colours for empty intersections (light) and for
 #' both non-empty intersections and segments (dark)
+#' @param shape Point shape passed to the intersections matrix
+#' @param size Passed to labels for sets and intersections, and to point sizes
+#' for the intersections matrix
+#' @param hjust,vjust Passed to respective elements for simple adjustment of
+#' either set or intersection sizes
 #'
 #' @return List of ggplot2 elements
 #'
 #' @examples
-#' # View the unevaluated list of default layers for the sets
+#' # View the un-evaluated list of default layers for the sets
 #' default_set_layers(dry_run = TRUE)
 #'
 #' # Create set layers colouring by set name, and hiding the legend
@@ -41,11 +61,12 @@
 #'
 #' @import ggplot2
 #' @importFrom scales comma
-#' @importFrom rlang expr !! sym
+#' @importFrom rlang expr sym
 #' @export
 #' @rdname default-layers
 default_set_layers <- function(
-    ..., fill = NULL, f = comma, expand = 0.2, name = "Set Size", dry_run = FALSE
+    ..., fill = NULL, f = comma, expand = 0.2, hjust = 1.1, size = 3.5,
+    name = "Set Size", dry_run = FALSE
 ){
 
   bar_aes <- aes()
@@ -63,8 +84,8 @@ default_set_layers <- function(
   layers <- expr(
     list(
       aes(y = set),
-      geom_bar(mapping = bar_aes),
-      geom_text(aes(x = n, label = f(n)), hjust = 1.1, size = 3.5),
+      geom_bar(bar_aes),
+      geom_text(aes(x = n, label = f(n)), hjust = hjust, size = size),
       scale_x_reverse(expand = c(expand, 0, 0, 0), name = name, labels = f),
       scale_y_discrete(position = "right", name = NULL, labels = NULL),
       theme(
@@ -86,8 +107,8 @@ default_set_layers <- function(
 #' @export
 #' @rdname default-layers
 default_intersect_layers <- function(
-    ..., fill = NULL, f = comma, expand = 0.05, name = "Intersection Size",
-    dry_run = FALSE
+    ..., fill = NULL, f = comma, expand = 0.05, vjust = -0.5, size = 3.5,
+    name = "Intersection Size", dry_run = FALSE
 ){
 
   bar_aes <- aes()
@@ -105,10 +126,10 @@ default_intersect_layers <- function(
   layers <- expr(
     list(
       aes(x = intersect),
-      geom_bar(mapping = bar_aes),
-      geom_text(aes(y = n, label = f(n)), vjust = -0.5, size = 3.5),
+      geom_bar(bar_aes),
+      geom_text(aes(y = n, label = f(n)), vjust = vjust, size = size),
       scale_x_discrete(name = NULL, labels = NULL),
-      scale_y_continuous(name = name, expand = c(0, 0, expand, 0)),
+      scale_y_continuous(name = name, expand = c(0, 0, expand, 0), labels = f),
       theme(
         axis.ticks.x.bottom = element_blank(),
         margins = margin(5.5, 5.5, 0, 0)
@@ -127,29 +148,11 @@ default_intersect_layers <- function(
 #' @export
 #' @rdname default-layers
 default_grid_layers <- function(
-    ..., colour = NULL, fill = NULL, light = "grey80", dark = "grey23", dry_run = FALSE
+    ..., colour = NULL, fill = NULL, light = "grey80", dark = "grey23",
+    shape = 19, size = 4, name = NULL, dry_run = FALSE
 ){
 
-  # points_geom <- geom_point(size = 4, shape = 19, colour = dark)
-  # segment_geom <- geom_segment(
-  #   aes(y = !!sym("y_min"), yend = !!sym("y_max")), colour = dark
-  # )
-  # if (!is.null(colour)) {
-  #
-  #   if (is.null(points_geom$mapping)) points_geom$mapping <- aes()
-  #   points_geom$aes_params$colour <- NULL
-  #   points_geom$mapping$colour <- sym(colour)
-  #
-  #   if (is.null(segment_geom$mapping)) segment_geom$mapping <- aes()
-  #   segment_geom$aes_params$colour <- NULL
-  #   segment_geom$mapping$colour <- sym(colour)
-  #
-  # }
-  # if (!is.null(fill)) {
-  #   if (is.null(points_geom$mapping)) points_geom$mapping <- aes()
-  #   points_geom$mapping$fill <- sym(fill)
-  # }
-
+  ## Set aesthetics manually before producing complete layers
   points_aes <- aes()
   segment_aes <- aes(y = !!sym("y_min"), yend = !!sym("y_max"))
   if (!is.null(colour)) {
@@ -167,18 +170,14 @@ default_grid_layers <- function(
     list(
       aes(x = intersect, y = set),
       if (!is.null(colour)) {
-        geom_point(mapping = points_aes, size = 4, shape = 19)
+        geom_point(mapping = points_aes, size = size, shape = shape)
       } else {
-        geom_point(mapping = points_aes, size = 4, shape = 19, colour = dark)
+        geom_point(mapping = points_aes, size = size, shape = shape, colour = dark)
       },
-      geom_point(size = 4, shape = 19, colour = light), # Empty intersections
-      if (!is.null(colour)) {
-        geom_segment(mapping = segment_aes)
-      } else {
-        geom_segment(mapping = segment_aes, colour = dark)
-      },
+      geom_point(size = size, shape = shape, colour = light), # Empty intersections
+      if (!is.null(colour)) geom_segment(segment_aes) else geom_segment(segment_aes, colour = dark),
       scale_y_discrete(name = NULL),
-      scale_x_discrete(name = NULL, labels = NULL),
+      scale_x_discrete(name = name, labels = NULL),
       guides(colour = guide_none()),
       theme(
         margins = margin(5.5, 5.5, 5.5, 0),

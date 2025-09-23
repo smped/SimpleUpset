@@ -25,10 +25,12 @@ Imports:
   tidyr,
   tidyselect
 Suggests: 
-    readr,
+    knitr,
+    pander,
     testthat (>= 3.0.0),
     tidyverse,
     UpSetR
 RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
+VignetteBuilder: knitr

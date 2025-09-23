@@ -11,6 +11,8 @@ default_set_layers(
   fill = NULL,
   f = comma,
   expand = 0.2,
+  hjust = 1.1,
+  size = 3.5,
   name = "Set Size",
   dry_run = FALSE
 )
@@ -20,6 +22,8 @@ default_intersect_layers(
   fill = NULL,
   f = comma,
   expand = 0.05,
+  vjust = -0.5,
+  size = 3.5,
   name = "Intersection Size",
   dry_run = FALSE
 )
@@ -30,6 +34,9 @@ default_grid_layers(
   fill = NULL,
   light = "grey80",
   dark = "grey23",
+  shape = 19,
+  size = 4,
+  name = NULL,
   dry_run = FALSE
 )
 }
@@ -44,6 +51,12 @@ the main data object}
 
 \item{expand}{axis expansion}
 
+\item{hjust, vjust}{Passed to respective elements for simple adjustment of
+either set or intersection sizes}
+
+\item{size}{Passed to labels for sets and intersections, and to point sizes
+for the intersections matrix}
+
 \item{name}{Main axis title}
 
 \item{dry_run}{Set as TRUE to view the unevaluated layers which are defined
@@ -55,6 +68,8 @@ intersections matrix}
 
 \item{light, dark}{default colours for empty intersections (light) and for
 both non-empty intersections and segments (dark)}
+
+\item{shape}{Point shape passed to the intersections matrix}
 }
 \value{
 List of ggplot2 elements
@@ -64,15 +79,30 @@ Define and modify default layers for individual UpSet components
 }
 \details{
 These functions define the default layers for inclusion on UpSet plots.
-Given the returned object is a simple list, these are easily modifiable using
-simple list operations.
-Additional themes, guides, scales etc can be easily added using the dot
-arguments.
 
-The underlying code for simple modification can be obtained using \code{dry_run = FALSE}
+The returned object is a list with a series of layers, scales, themes etc
+which represent the default plotting layers for each of the sets,
+intersections and intersections matrix (grid) panels.
+
+A series of common arguments have been defined to enable common modifications
+without recreating the list from scratch. These include modifying the mapping
+to fill, axis expansion to better accommodate labels, labelling functions for
+set/intersection sizes, and axis titles.
+
+Additional layers, such as scale_fill_* elements, guides or themes, can be
+simply included by passing to the function, without any requirement for
+naming, and are handled by the ellipsis.
+
+The entire command used to create default layers can be shown by calling each
+function using the argument \code{dry_run = TRUE}.
+This can be helpful for creating custom layers, by starting with then
+modifying the defaults.
+
+The returned object is a simple list, and are easily modifiable using
+simple list operations.
 }
 \examples{
-# View the unevaluated list of default layers for the sets
+# View the un-evaluated list of default layers for the sets
 default_set_layers(dry_run = TRUE)
 
 # Create set layers colouring by set name, and hiding the legend

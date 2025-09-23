@@ -1,0 +1,184 @@
+---
+title: "An Introduction to SimpleUpset"
+bibliography: '`r system.file("references.bib", package = "SimpleUpset")`'
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{An Introduction to SimpleUpset}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE, message = FALSE, warning = FALSE,
+  fig.width = 8, fig.height = 6,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(tidyverse)
+library(SimpleUpset)
+library(pander)
+theme_set(theme_bw())
+```
+
+The package `SimpleUpset` has been written to ensure that UpSet plots [@6876017] 
+remain consistently available to the ecosystem of `R` users.
+The underlying functions are built depending heavily on the package infrastructure
+provided by the `tidyverse` [@wickham-tidy]
+
+As is commonly used for examples, a modified version of the `movies` data will 
+be used for this set of examples, as originally provided in the package `UpSetR`
+[@Gehlenborg2019-up].
+This version of the data has a reduced number of categories and also has the 
+decade of release included
+
+```{r load-movies}
+movies <- system.file("extdata", "movies.tsv.gz", package = "SimpleUpset") %>%
+  read_tsv() %>%
+  mutate(
+    Decade = fct_inorder(Decade) %>% fct_rev()
+  )
+```
+
+```{r tbl-movies, echo = FALSE}
+movies %>% 
+  count(Decade) %>% 
+  pander(
+    caption = "Summary of movies by decade",
+    justify = "lr"
+  )
+```
+
+## Basic Usage
+
+At it's most simple, the function `simpleUpSet` requires a data.frame with sets
+to include for display using the UpSet plots.
+The sets should be strictly `0/1` values which can be coerced to logical values, or logical values directly.
+
+```{r simple-upset}
+sets <- c("Action", "Comedy", "Drama", "Thriller", "Romance")
+simpleUpSet(movies, sets)
+```
+
+The number of intersections can be controlled using the arguments `n_intersect` 
+to define a maximum number plotted, or `min_size` to only show those greater 
+than any given size.
+
+## Customising Plots
+
+Each of the panels in the complete UpSet figure is referred to as being either 
+1. `sets` (the bottom left), 2. `intersect` (the top right panel), or 3. `grid`, 
+representing the intersections matrix at the bottom right.
+Default layers for each panel are produced by the functions 
+`default_set_layers()`, `default_intersect_layers()` or `default_grid_layers()`.
+The default calls to ggplot layers, scales, themes etc are easily visible by 
+passing the argument, `dry_run = TRUE`.
+These can then be copied to a new object to begin customisation from a low level.
+
+```{r default-sets}
+default_set_layers(dry_run = TRUE)
+```
+
+A more simple strategy is to pass a set of key parameters to each function as
+described on the help page.
+Any additional layers are handled simply by the ellipsis (`...`)
+
+```{r upset-decade}
+simpleUpSet(
+  movies, sets, min_size = 20,
+  intersect_layers = default_intersect_layers(
+    fill = "Decade",
+    scale_fill_brewer(palette = "Paired"),
+    theme(
+      legend.position = "inside",
+      legend.position.inside = c(0.99, 0.99),
+      legend.justification.inside = c(1, 1)
+    )
+  ),
+  set_layers = default_set_layers(
+    fill = "Decade", scale_fill_brewer(palette = "Paired"),
+    guides(fill = guide_none()), expand = 0.3
+  )
+)
+```
+
+## Highlighting Intersections and Sets
+
+Sets and intersections can be simply highlighted using the set name for sets, 
+or by using a `case_when()` statement to define highlights
+
+```{r upset-highlights}
+## Define the sets to be coloured by name, the use scale_fill_manual
+set_cols <- c(
+  Action = "red", Comedy = "grey23", Drama = "red", 
+  Romance = "grey23", Thriller = "grey23"
+)
+set_list <- default_set_layers(fill = "set", scale_fill_manual(values = set_cols))
+## Use the highlights to colour the intersection bars based on the column 
+## 'highlight', in conjunction with the case_when statement
+intersect_list <- default_intersect_layers(
+    fill = "highlight", scale_fill_manual(values = "red", na.value = "grey23")
+  )
+## When passing the 'highlight' column, this will be passed to both points
+## and segments. Each layer can be manually edited to override this if preferred
+grid_list <- default_grid_layers(
+  colour = "highlight", scale_colour_manual(values = "red", na.value = "grey23")
+)
+simpleUpSet(
+  movies, sets, min_size = 20,
+  set_layers = set_list,
+  intersect_layers = intersect_list,
+  grid_layers = grid_list,
+  highlight = case_when(Action & Drama ~ TRUE)
+) &
+  plot_annotation(title = "Using Highlights") &
+  theme(legend.position = "none", plot.title = element_text(hjust = 2/3))
+```
+
+## Adding Plots to Upper Panels
+
+Additional panels can be included using the `annotations` argument
+
+```{r upset-boxplot, fig.height=8}
+## Add a simple boxplot
+simpleUpSet(
+  movies, sets, n_intersect = 10,
+  set_layers = default_set_layers(expand = 0.3),
+  intersect_layers = default_intersect_layers(expand = 0.1),
+  annotations = list(geom_boxplot(aes(y = AvgRating))),
+)
+```
+
+There is no particular limit to the complexity of the upper panels, beyond what
+is contained within the dataset, or what can be considered as useful for 
+communication with readers
+
+```{r upset-violin, fig.height=8}
+simpleUpSet(
+  movies, sets, n_intersect = 10,
+  set_layers = default_set_layers(expand = 0.3),
+  intersect_layers = default_intersect_layers(expand = 0.1),
+  annotations = list(
+    list(
+      aes(y = AvgRating),
+      geom_jitter(aes(colour = Decade), height = 0, width = 0.3, alpha = 0.5),
+      geom_violin(fill = NA, quantiles = 0.5, quantile.linetype = 1),
+      scale_colour_brewer(palette = "Paired"),
+      guides(colour = guide_legend(nrow = 2, reverse = TRUE))
+    )
+  ), guides = "collect"
+) &
+  theme(legend.position = "bottom")
+```
+
+
+## SessionInfo
+
+```{r session-info, echo = FALSE}
+pander::pander(sessionInfo())
+```
+
+
+## References
