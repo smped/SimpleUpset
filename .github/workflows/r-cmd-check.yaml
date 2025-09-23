@@ -87,42 +87,42 @@ jobs:
           )
         shell: Rscript {0}
 
-pkgdown:
-  runs-on: ubuntu-latest
-  if: github.ref == 'refs/heads/gh-actions'
-  env:
-    GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-  permissions:
-    contents: read
-    pages: write
-    id-token: write
+  pkgdown:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/gh-actions'
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
 
-  steps:
-    - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-    - uses: r-lib/actions/setup-pandoc@v2
+      - uses: r-lib/actions/setup-pandoc@v2
 
-    - uses: r-lib/actions/setup-r@v2
-      with:
-        use-public-rspm: true
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
 
-    - uses: r-lib/actions/setup-r-dependencies@v2
-      with:
-        extra-packages: any::pkgdown, local::.
-        needs: website
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::pkgdown, local::.
+          needs: website
 
-    - name: Build site
-      run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
-      shell: Rscript {0}
+      - name: Build site
+        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
+        shell: Rscript {0}
 
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
 
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: ./docs
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs
 
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
