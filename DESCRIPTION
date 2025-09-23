@@ -6,31 +6,34 @@ Authors@R: c(
     person(
       "Stevie", "Pederson",
       email = "stephen.pederson.au@gmail.com",
-      role = c("aut", "cre")
+      role = c("aut", "cre"),
+      comment = c(ORCID = "0000-0001-8197-3303")
     )
   )
 Description: Create UpSet plots using a combination of ggplot2 and patchwork.
+URL: https://github.com/smped/SimpleUpset
+BugReports: https://github.com/smped/SimpleUpset/issues
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends:
   ggplot2 (>= 4.0.0),
-  patchwork,
+  patchwork (>= 1.3.2),
   R (>= 4.5.0),
 Imports:
   dplyr,
   methods,
-  rlang,
+  rlang (>= 1.1.6),
   scales,
   tidyr,
   tidyselect
 Suggests: 
-    knitr,
-    pander,
-    pkgdown,
-    testthat (>= 3.0.0),
-    tidyverse,
-    UpSetR
+  knitr,
+  pander,
+  pkgdown,
+  testthat (>= 3.0.0),
+  tidyverse (>= 2.0.0),
+  UpSetR
 RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3

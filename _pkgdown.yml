@@ -29,3 +29,4 @@ navbar:
   right:
   - icon: fa-github fa-lg
     href: https://github.com/smped/SimpleUpset
+    aria-label: View on github
