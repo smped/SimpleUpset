@@ -1,6 +1,9 @@
 ## CRAN R CMD check workflow
 ## Converted from Bioconductor workflow for standard CRAN packages
 
+## CRAN R CMD check workflow
+## Converted from Bioconductor workflow for standard CRAN packages
+
 on:
   push:
   pull_request:
@@ -82,14 +85,16 @@ jobs:
           covr::codecov(
             quiet = FALSE,
             clean = FALSE,
-            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package"),
-            token = "${{ secrets.CODECOV_TOKEN }}"
+            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
           )
         shell: Rscript {0}
 
   pkgdown:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/gh-actions'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
@@ -115,14 +120,9 @@ jobs:
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to GitHub pages 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
-          path: ./docs
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          clean: false
+          branch: gh-pages
+          folder: docs
