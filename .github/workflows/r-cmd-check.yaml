@@ -6,9 +6,7 @@
 
 on:
   push:
-    branches: [main]  # Deploy when pushing to main
   pull_request:
-    branches: [main]
 
 name: R-CMD-check-CRAN
 
@@ -94,15 +92,8 @@ jobs:
   pkgdown:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/gh-actions'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -118,13 +109,13 @@ jobs:
           extra-packages: any::pkgdown, local::.
           needs: website
 
-      - name: Build site
-        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
-        shell: Rscript {0}
+      - name: Configure Git
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git config --global --add safe.directory $GITHUB_WORKSPACE
 
-      - name: Deploy to GitHub pages 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.4.1
-        with:
-          clean: false
-          branch: gh-pages
-          folder: docs
+      - name: Deploy to gh-pages
+        run: |
+          pkgdown::deploy_to_branch(new_process = FALSE)
+        shell: Rscript {0}
