@@ -58,7 +58,7 @@
 #' | **ggplot2 element** | **Comment** |
 #' | :------------------ | :---------- |
 #' | `aes(x = intersect, y = set)` | Defines the grid layout to match the sets and intersections panels |
-#' | `if (!is.null(colour)) geom_point(mapping = points_aes, size = size, shape = shape) else geom_point(mapping = points_aes, size = size, shape = shape, colour = dark)` | These points represent the main intersections. In general, colour/fill will only be required if highlighting points and the constant value is removed using an `ifelse` statment is colour is set as a mapping aesthetic |
+#' | `if (!is.null(colour)) geom_point(mapping = points_aes, size = size, shape = shape) else geom_point(mapping = points_aes, size = size, shape = shape, colour = dark)` | These points represent the main intersections. In general, colour/fill will only be required if highlighting points and the constant value is removed using an `ifelse` statement is colour is set as a mapping aesthetic |
 #' | `geom_point(size = size, shape = shape, colour = light)` | These points represent the background or empty intersections |
 #' | `if (!is.null(colour)) geom_segment(segment_aes) else geom_segment(segment_aes, colour = dark)` | The segments joining intersections, again removing colour if set as an aesthetic mapping |
 #' | `scale_y_discrete(name = NULL)` | Ensures the y-axis matches that of the sets panel |

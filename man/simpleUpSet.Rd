@@ -8,9 +8,12 @@ simpleUpSet(
   x,
   sets = NULL,
   sort_sets = c("ascending", "descending", "none"),
-  sort_intersect = TRUE,
+  sort_intersect = c("descending", "ascending", "none"),
+  intersect_by = c("size", "degree", "set"),
   n_intersect = 20,
   min_size = 0,
+  min_degree = 1,
+  max_degree = length(sets),
   set_layers = default_set_layers(),
   intersect_layers = default_intersect_layers(),
   grid_layers = default_grid_layers(),
@@ -33,11 +36,15 @@ simpleUpSet(
 
 \item{sort_sets}{Can be "ascending", "descending", "none"}
 
-\item{sort_intersect}{Show intersections in decreasing order}
+\item{sort_intersect}{Can be "ascending", "descending", "none"}
+
+\item{intersect_by}{Sort intersections by size, degree or set}
 
 \item{n_intersect}{Maximum number of intersections to show}
 
 \item{min_size}{Only show intersections larger than this value}
+
+\item{min_degree, max_degree}{Only show intersections within this range}
 
 \item{set_layers}{List of \code{ggplot2} layers, scales and themes to define the
 appearance of the sets panel. Can be obtained and extended using

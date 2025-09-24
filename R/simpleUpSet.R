@@ -30,9 +30,11 @@
 #' @param x Input data frame
 #' @param sets Character vector listing columns of x to plot
 #' @param sort_sets Can be "ascending", "descending", "none"
-#' @param sort_intersect Show intersections in decreasing order
+#' @param sort_intersect Can be "ascending", "descending", "none"
+#' @param intersect_by Sort intersections by size, degree or set
 #' @param n_intersect Maximum number of intersections to show
 #' @param min_size Only show intersections larger than this value
+#' @param min_degree,max_degree Only show intersections within this range
 #' @param set_layers List of `ggplot2` layers, scales and themes to define the
 #' appearance of the sets panel. Can be obtained and extended using
 #' [default_set_layers()]
@@ -106,8 +108,10 @@
 simpleUpSet <- function(
     x,
     sets = NULL, sort_sets = c("ascending", "descending", "none"),
-    sort_intersect = TRUE,
+    sort_intersect = c("descending", "ascending", "none"),
+    intersect_by = c("size", "degree", "set"),
     n_intersect = 20, min_size = 0,
+    min_degree = 1, max_degree = length(sets),
     set_layers = default_set_layers(),
     intersect_layers = default_intersect_layers(),
     grid_layers = default_grid_layers(),
@@ -118,25 +122,30 @@ simpleUpSet <- function(
     guides = "keep", top_left = NULL, ..., na.rm = TRUE
 ){
 
-
+  ## Initial checks & argument handling
   sort_sets <- match.arg(sort_sets)
-  sets <- .check_sets(x, sets, na.rm)
+  sort_intersect <- match.arg(sort_intersect)
+  intersect_by <- match.arg(intersect_by)
   stopifnot(all(c(width, height) < 1))
+
+  ## Need to define set levels here for all downstream private funs
+  sets <- .check_sets(x, sets, na.rm)
+  sets <- .get_set_levels(x, sets, sort_sets)
 
   ## Get intersections table
   intersect_tbl <- .add_intersections(
-    x, sets, sort_intersect, na.rm, enquo(highlight)
+    x, sets, sort_intersect, intersect_by, na.rm, enquo(highlight)
   )
 
   ## Sets panel
-  p_sets <- .plot_sets(
-    intersect_tbl, sets, sort_sets, set_layers, stripe_colours
-  )
+  p_sets <- .plot_sets(intersect_tbl, sets, set_layers, stripe_colours)
 
   ## Intersections panel
-  intersect_tbl <- subset(intersect_tbl, as.integer(intersect) <= n_intersect)
   vjust <- max(nchar(sets)) * vjust_ylab ## Place labels closer to y
-  p_int <- .plot_intersect(intersect_tbl, min_size, intersect_layers, vjust)
+  p_int <- .plot_intersect(
+    intersect_tbl, min_size, n_intersect, min_degree, max_degree,
+    intersect_layers, vjust
+  )
 
   ## Intersections matrix
   p_mat <- .plot_grid(p_int, p_sets, grid_layers, stripe_colours)
@@ -225,7 +234,7 @@ simpleUpSet <- function(
   sets <-levels(p_sets@data$set)
   ## The grid tbl will contain all intersections
   df <- p_int@data
-  groups <- intersect(c(sets, "intersect", "highlight"), colnames(df))
+  groups <- intersect(c(sets, "intersect", "highlight", "degree"), colnames(df))
   grid_tbl <- distinct(df, !!!syms(groups))
   grid_tbl <- pivot_longer(
     grid_tbl, all_of(sets), names_to = "set", values_to = "in_group"
@@ -239,7 +248,7 @@ simpleUpSet <- function(
   seg_tbl <- summarise(
     grid_tbl,
     y_max = max(!!sym("set_int")), y_min = min(!!sym("set_int")),
-    .by = any_of(c("intersect", "highlight"))
+    .by = any_of(c("intersect", "highlight", "degree"))
   )
 
   ## These layers are more challenging to wrangle using defaults. However
@@ -275,7 +284,9 @@ simpleUpSet <- function(
 #' @importFrom methods is
 #' @import ggplot2
 #' @keywords internal
-.plot_intersect <- function(tbl, min_size, layers, vj){
+.plot_intersect <- function(
+    tbl, min_size, n_intersect, min_degree, max_degree, layers, vj
+){
 
   if (!is(layers, "default_layers")) {
     is_gg <- vapply(layers, .check_gg_layers, logical(1))
@@ -287,11 +298,20 @@ simpleUpSet <- function(
     stopifnot(any(is_bar))
   }
 
+  n_intersect <- min(nrow(tbl), n_intersect) # Deal with Inf
+
   ## The totals summarised by intersect (ignoring any fill columns)
-  totals_df <- summarise(tbl, n = dplyr::n(), .by = all_of("intersect"))
-  totals_df <- dplyr::filter(totals_df, n > min_size)
+  totals_df <- summarise(
+    tbl, n = dplyr::n(), .by = any_of(c("intersect", "degree"))
+  )
+  totals_df <- dplyr::filter(
+    totals_df, n > min_size, degree >= min_degree, degree <= max_degree
+  )
+  totals_df <- dplyr::arrange(totals_df, intersect)
+  totals_df <- dplyr::slice(totals_df, seq_len(n_intersect))
   totals_df$intersect <- droplevels(totals_df$intersect)
   tbl <- dplyr::filter(tbl, intersect %in% levels(totals_df$intersect))
+  if ("degree" %in% colnames(tbl)) tbl$degree <- as.factor(tbl$degree)
 
   ## Check for labels
   is_labels <- vapply(
@@ -313,12 +333,23 @@ simpleUpSet <- function(
 
 }
 
+.get_set_levels <- function(tbl, sets, sort_sets) {
+  ## Get the set levels
+  col_sums <- colSums(tbl[sets])
+  set_levels <- sets
+  if (sort_sets != "none") {
+    sort_lgl <- sort_sets == "descending"
+    set_levels <- names(sort(col_sums, decreasing = sort_lgl))
+  }
+  set_levels
+}
+
 #' @importFrom dplyr across summarise
 #' @importFrom tidyr pivot_longer
 #' @importFrom methods is
 #' @import ggplot2
 #' @keywords internal
-.plot_sets <- function(tbl, sets, sort_sets, layers, stripe_colours){
+.plot_sets <- function(tbl, sets, layers, stripe_colours){
 
   ## Check the layers
   if (!is(layers, "default_layers")) {
@@ -331,24 +362,15 @@ simpleUpSet <- function(
     stopifnot(any(is_bar))
   }
 
-  ## Get the set levels
-  col_sums <- colSums(tbl[sets])
-  set_levels <- sets
-
-  if (sort_sets != "none") {
-    sort_lgl <- sort_sets == "descending"
-    set_levels <- names(sort(col_sums, decreasing = sort_lgl))
-  }
-
-
   ## Sets will contain logical values here
   sets_tbl <- pivot_longer(tbl, all_of(sets), names_to = "set")
   sets_tbl <- sets_tbl[sets_tbl$value,]
-  sets_tbl$set <- factor(sets_tbl$set, set_levels)
+  sets_tbl$set <- factor(sets_tbl$set, sets)
 
   ## Calculate set totals for optional labels
+  col_sums <- colSums(tbl[sets])
   counts_tbl <- data.frame(
-    set = factor(names(col_sums), levels = set_levels), n = col_sums
+    set = factor(names(col_sums), levels = sets), n = col_sums
   )
   ## Check for labels
   is_labels <- vapply(
@@ -361,7 +383,7 @@ simpleUpSet <- function(
   for (i in which(is_labels)) layers[[i]]$data <- counts_tbl
 
   ## The main plot
-  stripe_geom <- .bg_stripes(set_levels, stripe_colours)
+  stripe_geom <- .bg_stripes(sets, stripe_colours)
   p <- ggplot(sets_tbl) + stripe_geom
   for (i in seq_along(layers)) p <- p + layers[[i]]
   p
@@ -398,7 +420,7 @@ simpleUpSet <- function(
 #' @importFrom dplyr if_any summarise left_join mutate
 #' @importFrom rlang quo_is_null !!
 #' @importFrom tidyselect all_of
-.add_intersections <- function(x, sets, sort, na.rm, hl){
+.add_intersections <- function(x, sets, sort, intersect_by, na.rm, hl){
 
 
   ## Coerce all set columns to be logical & remove rows where all are FALSE
@@ -414,7 +436,24 @@ simpleUpSet <- function(
 
   ## Determine the intersect number to a column in the original
   set_tbl <- summarise(x, n = dplyr::n(), .by = c(all_of(sets)))
-  if (sort) set_tbl <- set_tbl[order(set_tbl$n, decreasing = TRUE),]
+  set_tbl$degree <- rowSums(set_tbl[sets])
+  # intersect_by <- "size" # or 'set', or 'degree'
+
+  if (sort != "none") {
+    ## Set decreasing = TRUE if sort == descending
+    sort_lgl <- sort == "descending"
+
+    if (intersect_by == "size") o <- order(set_tbl$n, decreasing = sort_lgl)
+    if (intersect_by == "degree") {
+      ## This will always sort by decreasing totals. Maybe there's another way?
+      o <- order(set_tbl$degree, set_tbl$n, decreasing = c(sort_lgl, TRUE))
+    }
+    if (intersect_by == "set") {
+      o <- do.call("order", c(as.list(set_tbl[sets]), list(decreasing = sort_lgl)))
+    }
+    set_tbl <- set_tbl[o,]
+  }
+
   set_tbl$intersect <- as.factor(seq_len(nrow(set_tbl)))
   set_tbl$n <- NULL
 
