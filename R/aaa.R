@@ -1,3 +1,3 @@
 globalVariables(
-  c("intersect", "set", "n", "label")
+  c("intersect", "set", "n", "label", "degree")
 )

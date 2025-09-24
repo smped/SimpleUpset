@@ -132,7 +132,7 @@ standard list manipulation.
 \subsection{Default Layers For Intersections Matrix (i.e. Grid)}{\tabular{ll}{
    \strong{ggplot2 element} \tab \strong{Comment} \cr
    \code{aes(x = intersect, y = set)} \tab Defines the grid layout to match the sets and intersections panels \cr
-   \code{if (!is.null(colour)) geom_point(mapping = points_aes, size = size, shape = shape) else geom_point(mapping = points_aes, size = size, shape = shape, colour = dark)} \tab These points represent the main intersections. In general, colour/fill will only be required if highlighting points and the constant value is removed using an \code{ifelse} statment is colour is set as a mapping aesthetic \cr
+   \code{if (!is.null(colour)) geom_point(mapping = points_aes, size = size, shape = shape) else geom_point(mapping = points_aes, size = size, shape = shape, colour = dark)} \tab These points represent the main intersections. In general, colour/fill will only be required if highlighting points and the constant value is removed using an \code{ifelse} statement is colour is set as a mapping aesthetic \cr
    \code{geom_point(size = size, shape = shape, colour = light)} \tab These points represent the background or empty intersections \cr
    \code{if (!is.null(colour)) geom_segment(segment_aes) else geom_segment(segment_aes, colour = dark)} \tab The segments joining intersections, again removing colour if set as an aesthetic mapping \cr
    \code{scale_y_discrete(name = NULL)} \tab Ensures the y-axis matches that of the sets panel \cr
