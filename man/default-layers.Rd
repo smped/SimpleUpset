@@ -100,6 +100,48 @@ modifying the defaults.
 
 The returned object is a simple list, and are easily modifiable using
 simple list operations.
+Each list of default layers is described clearly below.
+If passing additional scales, themes, layers or guides using the ellipsis,
+these additional elements will automatically be placed after the defaults.
+Importantly, these will be created as lists, then can be re-ordered using
+standard list manipulation.
+\subsection{Default Layers For Sets}{\tabular{ll}{
+   \strong{ggplot2 element} \tab \strong{Comment} \cr
+   \code{aes(y = set)} \tab Sets are placed on the y-axis \cr
+   \code{geom_bar(bar_aes)} \tab If \code{fill = NULL}, \code{bar_aes} is the call to \code{aes()} otherwise it is \code{aes(fill = !!sym(fill))}. This object is created internally by \code{default_set_layers()} \cr
+   \code{geom_text(aes(x = n, label = f(n)), hjust = hjust, size = size)} \tab Adds set totals using the labelling function provided as \code{f}. A data.frame is created when calling \code{simpleUpSet} which summarises set totals as the column \code{n} \cr
+   \code{scale_x_reverse(expand = c(expand, 0, 0, 0), name = name, labels = f)} \tab Ensures bars go in reverse order along the x-axis, with the expansion providing room for set totals \cr
+   \code{scale_y_discrete(position = "right", name = NULL, labels = NULL)} \tab Tidies up the y-axis with set names \cr
+   \code{theme(axis.text.y.right = element_text(hjust = 0.5), axis.ticks.y.right = element_blank(), margins = margin(5.5, 0, 5.5, 5.5))} \tab Ensures margins and tick marks are suitable for the UpSet layout \cr
+}
+
+}
+
+\subsection{Default Layers For Intersections}{\tabular{ll}{
+   \strong{ggplot2 element} \tab \strong{Comment} \cr
+   \code{aes(x = intersect)} \tab Intersections are placed along the x-axis \cr
+   \code{geom_bar(bar_aes)} \tab If \code{fill = NULL}, \code{bar_aes} is the call to \code{aes()} otherwise it is \code{aes(fill = !!sym(fill))}. This object is created internally by \code{default_intersect_layers()} \cr
+   \code{geom_text(aes(y = n, label = f(n)), vjust = vjust, size = size)} \tab Adds intersection totals using the labelling function provided as \code{f}. A data.frame is created when calling \code{simpleUpSet} which summarises intersection totals as the column \code{n} \cr
+   \code{scale_x_discrete(name = NULL, labels = NULL)} \tab Tidies up the x-axis, hiding intersection names \cr
+   \code{scale_y_continuous(name = name, expand = c(0, 0, expand, 0), labels = f)} \tab Standard y-axis with name provided and with the expansion able to be easily set to accommodate labels \cr
+   \code{theme(axis.ticks.x.bottom = element_blank(), margins = margin(5.5, 5.5, 0, 0))} \tab Ensures margins and tick marks are suitable for the UpSet layout \cr
+}
+
+}
+
+\subsection{Default Layers For Intersections Matrix (i.e. Grid)}{\tabular{ll}{
+   \strong{ggplot2 element} \tab \strong{Comment} \cr
+   \code{aes(x = intersect, y = set)} \tab Defines the grid layout to match the sets and intersections panels \cr
+   \code{if (!is.null(colour)) geom_point(mapping = points_aes, size = size, shape = shape) else geom_point(mapping = points_aes, size = size, shape = shape, colour = dark)} \tab These points represent the main intersections. In general, colour/fill will only be required if highlighting points and the constant value is removed using an \code{ifelse} statment is colour is set as a mapping aesthetic \cr
+   \code{geom_point(size = size, shape = shape, colour = light)} \tab These points represent the background or empty intersections \cr
+   \code{if (!is.null(colour)) geom_segment(segment_aes) else geom_segment(segment_aes, colour = dark)} \tab The segments joining intersections, again removing colour if set as an aesthetic mapping \cr
+   \code{scale_y_discrete(name = NULL)} \tab Ensures the y-axis matches that of the sets panel \cr
+   \code{scale_x_discrete(name = name, labels = NULL)} \tab Ensures the x-axis matches that of the intersection panel, with an optional name \cr
+   \code{guides(colour = guide_none())} \tab By default, don't include a legend for any optionally coloured points \cr
+   \code{theme(margins = margin(5.5, 5.5, 5.5, 0), axis.text.y = element_text(hjust = 0.5), axis.ticks = element_blank())} \tab Ensures margins, text and tick marks are suitable for the UpSet layout \cr
+}
+
+}
 }
 \examples{
 # View the un-evaluated list of default layers for the sets
