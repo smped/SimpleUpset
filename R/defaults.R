@@ -25,6 +25,46 @@
 #'
 #' The returned object is a simple list, and are easily modifiable using
 #' simple list operations.
+#' Each list of default layers is described clearly below.
+#' If passing additional scales, themes, layers or guides using the ellipsis,
+#' these additional elements will automatically be placed after the defaults.
+#' Importantly, these will be created as lists, then can be re-ordered using
+#' standard list manipulation.
+#'
+#' ## Default Layers For Sets
+#'
+#' | **ggplot2 element** | **Comment** |
+#' | :------------------ | :---------- |
+#' | `aes(y = set)` | Sets are placed on the y-axis |
+#' | `geom_bar(bar_aes)` | If `fill = NULL`, `bar_aes` is the call to `aes()` otherwise it is `aes(fill = !!sym(fill))`. This object is created internally by `default_set_layers()` |
+#' | `geom_text(aes(x = n, label = f(n)), hjust = hjust, size = size)` | Adds set totals using the labelling function provided as `f`. A data.frame is created when calling `simpleUpSet` which summarises set totals as the column `n` |
+#' | `scale_x_reverse(expand = c(expand, 0, 0, 0), name = name, labels = f)` | Ensures bars go in reverse order along the x-axis, with the expansion providing room for set totals |
+#' | `scale_y_discrete(position = "right", name = NULL, labels = NULL)` | Tidies up the y-axis with set names |
+#' | `theme(axis.text.y.right = element_text(hjust = 0.5), axis.ticks.y.right = element_blank(), margins = margin(5.5, 0, 5.5, 5.5))` | Ensures margins and tick marks are suitable for the UpSet layout |
+#'
+#' ## Default Layers For Intersections
+#'
+#' | **ggplot2 element** | **Comment** |
+#' | :------------------ | :---------- |
+#' | `aes(x = intersect)` | Intersections are placed along the x-axis |
+#' | `geom_bar(bar_aes)` | If `fill = NULL`, `bar_aes` is the call to `aes()` otherwise it is `aes(fill = !!sym(fill))`. This object is created internally by `default_intersect_layers()` |
+#' | `geom_text(aes(y = n, label = f(n)), vjust = vjust, size = size)` | Adds intersection totals using the labelling function provided as `f`. A data.frame is created when calling `simpleUpSet` which summarises intersection totals as the column `n` |
+#' | `scale_x_discrete(name = NULL, labels = NULL)` | Tidies up the x-axis, hiding intersection names |
+#' | `scale_y_continuous(name = name, expand = c(0, 0, expand, 0), labels = f)` | Standard y-axis with name provided and with the expansion able to be easily set to accommodate labels |
+#' | `theme(axis.ticks.x.bottom = element_blank(), margins = margin(5.5, 5.5, 0, 0))` | Ensures margins and tick marks are suitable for the UpSet layout |
+#'
+#' ## Default Layers For Intersections Matrix (i.e. Grid)
+#'
+#' | **ggplot2 element** | **Comment** |
+#' | :------------------ | :---------- |
+#' | `aes(x = intersect, y = set)` | Defines the grid layout to match the sets and intersections panels |
+#' | `if (!is.null(colour)) geom_point(mapping = points_aes, size = size, shape = shape) else geom_point(mapping = points_aes, size = size, shape = shape, colour = dark)` | These points represent the main intersections. In general, colour/fill will only be required if highlighting points and the constant value is removed using an `ifelse` statment is colour is set as a mapping aesthetic |
+#' | `geom_point(size = size, shape = shape, colour = light)` | These points represent the background or empty intersections |
+#' | `if (!is.null(colour)) geom_segment(segment_aes) else geom_segment(segment_aes, colour = dark)` | The segments joining intersections, again removing colour if set as an aesthetic mapping |
+#' | `scale_y_discrete(name = NULL)` | Ensures the y-axis matches that of the sets panel |
+#' | `scale_x_discrete(name = name, labels = NULL)` | Ensures the x-axis matches that of the intersection panel, with an optional name |
+#' | `guides(colour = guide_none())` | By default, don't include a legend for any optionally coloured points |
+#' | `theme(margins = margin(5.5, 5.5, 5.5, 0), axis.text.y = element_text(hjust = 0.5), axis.ticks = element_blank())` | Ensures margins, text and tick marks are suitable for the UpSet layout |
 #'
 #' @param fill Column to fill set bars by. Can be 'set' or another column within
 #' the main data object
