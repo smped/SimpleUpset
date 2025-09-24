@@ -29,7 +29,7 @@
 #'
 #' @param x Input data frame
 #' @param sets Character vector listing columns of x to plot
-#' @param sort_sets Logical, if TRUE sort sets by size
+#' @param sort_sets Can be "ascending", "descending", "none"
 #' @param sort_intersect Show intersections in decreasing order
 #' @param n_intersect Maximum number of intersections to show
 #' @param min_size Only show intersections larger than this value
@@ -105,7 +105,8 @@
 #' @export
 simpleUpSet <- function(
     x,
-    sets = NULL, sort_sets = TRUE, sort_intersect = TRUE,
+    sets = NULL, sort_sets = c("ascending", "descending", "none"),
+    sort_intersect = TRUE,
     n_intersect = 20, min_size = 0,
     set_layers = default_set_layers(),
     intersect_layers = default_intersect_layers(),
@@ -118,6 +119,7 @@ simpleUpSet <- function(
 ){
 
 
+  sort_sets <- match.arg(sort_sets)
   sets <- .check_sets(x, sets, na.rm)
   stopifnot(all(c(width, height) < 1))
 
@@ -316,7 +318,7 @@ simpleUpSet <- function(
 #' @importFrom methods is
 #' @import ggplot2
 #' @keywords internal
-.plot_sets <- function(tbl, sets, sort, layers, stripe_colours){
+.plot_sets <- function(tbl, sets, sort_sets, layers, stripe_colours){
 
   ## Check the layers
   if (!is(layers, "default_layers")) {
@@ -332,8 +334,12 @@ simpleUpSet <- function(
   ## Get the set levels
   col_sums <- colSums(tbl[sets])
   set_levels <- sets
-  stopifnot(is.logical(sort))
-  if (sort[[1]]) set_levels <- names(sort(col_sums))
+
+  if (sort_sets != "none") {
+    sort_lgl <- sort_sets == "descending"
+    set_levels <- names(sort(col_sums, decreasing = sort_lgl))
+  }
+
 
   ## Sets will contain logical values here
   sets_tbl <- pivot_longer(tbl, all_of(sets), names_to = "set")

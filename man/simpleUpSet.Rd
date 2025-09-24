@@ -7,7 +7,7 @@
 simpleUpSet(
   x,
   sets = NULL,
-  sort_sets = TRUE,
+  sort_sets = c("ascending", "descending", "none"),
   sort_intersect = TRUE,
   n_intersect = 20,
   min_size = 0,
@@ -31,7 +31,7 @@ simpleUpSet(
 
 \item{sets}{Character vector listing columns of x to plot}
 
-\item{sort_sets}{Logical, if TRUE sort sets by size}
+\item{sort_sets}{Can be "ascending", "descending", "none"}
 
 \item{sort_intersect}{Show intersections in decreasing order}
 
