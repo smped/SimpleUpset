@@ -29,9 +29,14 @@
 #'
 #' @param x Input data frame
 #' @param sets Character vector listing columns of x to plot
-#' @param sort_sets Can be "ascending", "descending", "none"
-#' @param sort_intersect Can be "ascending", "descending", "none"
-#' @param intersect_by Sort intersections by size, degree or set
+#' @param sort_sets <[`data-masking`][rlang::args_data_masking]> specification
+#' for set order, using variables such as n, desc(n) or NULL. Passed internally
+#' to [dplyr::arrange()].
+#' The only possible column to call is 'n'
+#' @param sort_intersect list of <[`data-masking`][rlang::args_data_masking]>
+#' specifications for intersection order. Passed internally to
+#' [dplyr::arrange()]. The available columns are 'n', degree' and 'set' Any
+#' other column names will cause an error.
 #' @param n_intersect Maximum number of intersections to show
 #' @param min_size Only show intersections larger than this value
 #' @param min_degree,max_degree Only show intersections within this range
@@ -104,12 +109,13 @@
 #' @import patchwork
 #' @import ggplot2
 #' @importFrom rlang enquo
+#' @importFrom dplyr desc
 #' @export
 simpleUpSet <- function(
     x,
-    sets = NULL, sort_sets = c("ascending", "descending", "none"),
-    sort_intersect = c("descending", "ascending", "none"),
-    intersect_by = c("size", "degree", "set"),
+    sets = NULL,
+    sort_sets = n,
+    sort_intersect = list(desc(n), degree),
     n_intersect = 20, min_size = 0,
     min_degree = 1, max_degree = length(sets),
     set_layers = default_set_layers(),
@@ -123,18 +129,15 @@ simpleUpSet <- function(
 ){
 
   ## Initial checks & argument handling
-  sort_sets <- match.arg(sort_sets)
-  sort_intersect <- match.arg(sort_intersect)
-  intersect_by <- match.arg(intersect_by)
   stopifnot(all(c(width, height) < 1))
 
   ## Need to define set levels here for all downstream private funs
   sets <- .check_sets(x, sets, na.rm)
-  sets <- .get_set_levels(x, sets, sort_sets)
+  sets <- .get_set_levels(x, sets, enquo(sort_sets), na.rm)
 
   ## Get intersections table
   intersect_tbl <- .add_intersections(
-    x, sets, sort_intersect, intersect_by, na.rm, enquo(highlight)
+    x, sets, substitute(sort_intersect), na.rm, enquo(highlight)
   )
 
   ## Sets panel
@@ -190,6 +193,9 @@ simpleUpSet <- function(
   )
   if (!all(valid))
     stop("All elements of annotations must be a list of ggplot2 layers etc")
+
+  ## Make sure degree is discrete if included
+  if ("degree" %in% colnames(tbl)) tbl$degree <- as.factor(tbl$degree)
 
   ## Make a list for panels for wrapping
   lapply(
@@ -333,14 +339,24 @@ simpleUpSet <- function(
 
 }
 
-.get_set_levels <- function(tbl, sets, sort_sets) {
-  ## Get the set levels
-  col_sums <- colSums(tbl[sets])
-  set_levels <- sets
-  if (sort_sets != "none") {
-    sort_lgl <- sort_sets == "descending"
-    set_levels <- names(sort(col_sums, decreasing = sort_lgl))
-  }
+#' @importFrom dplyr summarise across arrange
+#' @importFrom rlang !! quo_is_null
+#' @importFrom tidyselect everything all_of
+#' @importFrom tidyr pivot_longer
+.get_set_levels <- function(tbl, sets, sort_sets, na.rm) {
+
+  sum_tbl <- summarise(tbl, across(all_of(sets), \(x) sum(x, na.rm = na.rm)))
+  sum_tbl <- pivot_longer(sum_tbl, everything(), names_to = "set", values_to = "n")
+  if (!quo_is_null(sort_sets)) sum_tbl <- arrange(sum_tbl, !!sort_sets)
+  set_levels <- sum_tbl$set
+
+  # ## Get the set levels
+  # col_sums <- colSums(tbl[sets])
+  # set_levels <- sets
+  # if (sort_sets != "none") {
+  #   sort_lgl <- sort_sets == "descending"
+  #   set_levels <- names(sort(col_sums, decreasing = sort_lgl))
+  # }
   set_levels
 }
 
@@ -417,11 +433,11 @@ simpleUpSet <- function(
 }
 
 #' @keywords internal
-#' @importFrom dplyr if_any summarise left_join mutate
-#' @importFrom rlang quo_is_null !!
+#' @importFrom dplyr if_any summarise left_join mutate arrange
+#' @importFrom tidyr pivot_wider
+#' @importFrom rlang quo_is_null !! !!!
 #' @importFrom tidyselect all_of
-.add_intersections <- function(x, sets, sort, intersect_by, na.rm, hl){
-
+.add_intersections <- function(x, sets, sort_expr, na.rm, hl){
 
   ## Coerce all set columns to be logical & remove rows where all are FALSE
   x[sets] <- lapply(x[sets], as.logical)
@@ -437,25 +453,26 @@ simpleUpSet <- function(
   ## Determine the intersect number to a column in the original
   set_tbl <- summarise(x, n = dplyr::n(), .by = c(all_of(sets)))
   set_tbl$degree <- rowSums(set_tbl[sets])
-  # intersect_by <- "size" # or 'set', or 'degree'
+  set_tbl$temp <- seq_len(nrow(set_tbl))
 
-  if (sort != "none") {
-    ## Set decreasing = TRUE if sort == descending
-    sort_lgl <- sort == "descending"
-
-    if (intersect_by == "size") o <- order(set_tbl$n, decreasing = sort_lgl)
-    if (intersect_by == "degree") {
-      ## This will always sort by decreasing totals. Maybe there's another way?
-      o <- order(set_tbl$degree, set_tbl$n, decreasing = c(sort_lgl, TRUE))
-    }
-    if (intersect_by == "set") {
-      o <- do.call("order", c(as.list(set_tbl[sets]), list(decreasing = sort_lgl)))
-    }
-    set_tbl <- set_tbl[o,]
+  ## Now use the data masking approach for arrange
+  if (!is.null(sort_expr)) {
+    ## Ensure sorting args are passed as a list
+    if (!sort_expr[[1]] == quote(list))
+      stop("Sorting for intersections must be passed as a list")
+    set_tbl <- pivot_longer(set_tbl, all_of(sets), names_to = "set")
+    set_tbl$set <- factor(set_tbl$set, levels = sets)
+    set_tbl <- arrange(set_tbl, !!!as.list(sort_expr[-1]))
+    set_tbl <- pivot_wider(
+      set_tbl, names_from = "set", values_from = "value",
+      id_cols = any_of(c("temp", "n", "degree", "highlight"))
+    )
   }
 
+
+  ## Add the intersection id & remove the temp columns
   set_tbl$intersect <- as.factor(seq_len(nrow(set_tbl)))
-  set_tbl$n <- NULL
+  set_tbl$n <- set_tbl$temp <- NULL
 
   ## Return the original table with intersect numbers & logical columns
   left_join(x, set_tbl, by = sets)

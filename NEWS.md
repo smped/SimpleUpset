@@ -1,3 +1,7 @@
+# SimpleUpset 0.0.4
+
+* Changed set & intersect sorting to use data masking instead
+
 # SimpleUpset 0.0.3
 
 * Changed set & intersect sorting to be 'ascending', 'descending' or 'none'

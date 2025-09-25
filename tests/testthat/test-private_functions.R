@@ -1,29 +1,40 @@
 
 test_that(".add_intersections adds & transforms columns", {
   hl <- NULL
-  tbl <- .add_intersections(movies, sets, "descending", "size", TRUE, enquo(hl))
+  sort_intersect <- substitute(list(desc(n)))
+  tbl <- .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl))
   expect_true(all(vapply(tbl[sets], is.logical, logical(1))))
   expect_true(all(colnames(tbl) %in% c(colnames(movies), "intersect", "degree")))
   expect_null(tbl[["highlight"]])
   hl <- ""
-  expect_error(.add_intersections(movies, sets, "descending", "size", TRUE, hl))
+  expect_error(.add_intersections(movies, sets, sort_intersect, TRUE, hl))
 
 })
 
 test_that("Sorting works as expected", {
   hl <- NULL
-  tbl <- .add_intersections(movies, sets, "descending", "size", TRUE, enquo(hl))
+
+  sort_intersect <- substitute(list(desc(n)))
+  tbl <- .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl))
   expect_true(which.max(table(tbl$intersect)) == 1)
-  tbl <- .add_intersections(movies, sets, "ascending", "size", TRUE, enquo(hl))
+
+  sort_intersect <- substitute(list(n))
+  tbl <- .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl))
   expect_true(which.max(table(tbl$intersect)) == 27)
-  tbl <- .add_intersections(movies, sets, "descending", "degree", TRUE, enquo(hl))
+
+  sort_intersect <- substitute(list(desc(degree), desc(n)))
+  tbl <- .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl))
   expect_true(which.max(table(tbl$intersect)) == 23)
-  tbl <- .add_intersections(movies, sets, "ascending", "degree", TRUE, enquo(hl))
+
+  sort_intersect <- substitute(list(degree, desc(n)))
+  tbl <- .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl))
   expect_true(table(tbl$intersect)[[5]] == 65)
-  tbl <- .add_intersections(movies, sets, "descending", "set", TRUE, enquo(hl))
-  expect_true(which.max(table(tbl$intersect)) == 24)
-  tbl <- .add_intersections(movies, sets, "ascending", "set", TRUE, enquo(hl))
-  expect_true(which.max(table(tbl$intersect)) == 4)
+
+  sort_intersect <- substitute(desc(n))
+  expect_error(
+    .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl)),
+    "Sorting.+"
+  )
 
 })
 
