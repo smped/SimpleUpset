@@ -464,13 +464,12 @@ simpleUpSet <- function(
     set_tbl <- pivot_longer(set_tbl, all_of(sets), names_to = "set")
     set_tbl$set <- factor(set_tbl$set, levels = sets)
     set_tbl <- arrange(set_tbl, !!!as.list(sort_expr[-1]))
-    set_tbl <- dplyr::filter(set_tbl, value)
+    set_tbl <- set_tbl[set_tbl[["value"]],]
     set_tbl <- pivot_wider(
       set_tbl, names_from = "set", values_from = "value", values_fill = FALSE,
       id_cols = any_of(c("temp", "size", "degree", "highlight"))
     )
   }
-
 
   ## Add the intersection id & remove the temp columns
   set_tbl$intersect <- as.factor(seq_len(nrow(set_tbl)))
