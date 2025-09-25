@@ -7,9 +7,8 @@
 simpleUpSet(
   x,
   sets = NULL,
-  sort_sets = c("ascending", "descending", "none"),
-  sort_intersect = c("descending", "ascending", "none"),
-  intersect_by = c("size", "degree", "set"),
+  sort_sets = n,
+  sort_intersect = list(desc(n), degree),
   n_intersect = 20,
   min_size = 0,
   min_degree = 1,
@@ -34,11 +33,15 @@ simpleUpSet(
 
 \item{sets}{Character vector listing columns of x to plot}
 
-\item{sort_sets}{Can be "ascending", "descending", "none"}
+\item{sort_sets}{<\code{\link[rlang:args_data_masking]{data-masking}}> specification
+for set order, using variables such as n, desc(n) or NULL. Passed internally
+to \code{\link[dplyr:arrange]{dplyr::arrange()}}.
+The only possible column to call is 'n'}
 
-\item{sort_intersect}{Can be "ascending", "descending", "none"}
-
-\item{intersect_by}{Sort intersections by size, degree or set}
+\item{sort_intersect}{list of <\code{\link[rlang:args_data_masking]{data-masking}}>
+specifications for intersection order. Passed internally to
+\code{\link[dplyr:arrange]{dplyr::arrange()}}. The available columns are 'n', degree' and 'set' Any
+other column names will cause an error.}
 
 \item{n_intersect}{Maximum number of intersections to show}
 
