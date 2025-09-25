@@ -12,7 +12,7 @@ default_set_layers(
   f = comma,
   expand = 0.2,
   hjust = 1.1,
-  size = 3.5,
+  label_size = 3.5,
   name = "Set Size",
   dry_run = FALSE
 )
@@ -23,7 +23,7 @@ default_intersect_layers(
   f = comma,
   expand = 0.05,
   vjust = -0.5,
-  size = 3.5,
+  label_size = 3.5,
   name = "Intersection Size",
   dry_run = FALSE
 )
@@ -54,8 +54,7 @@ the main data object}
 \item{hjust, vjust}{Passed to respective elements for simple adjustment of
 either set or intersection sizes}
 
-\item{size}{Passed to labels for sets and intersections, and to point sizes
-for the intersections matrix}
+\item{label_size}{Passed to labels for sets and intersections}
 
 \item{name}{Main axis title}
 
@@ -69,7 +68,7 @@ intersections matrix}
 \item{light, dark}{default colours for empty intersections (light) and for
 both non-empty intersections and segments (dark)}
 
-\item{shape}{Point shape passed to the intersections matrix}
+\item{shape, size}{Point shape/size passed to the intersections matrix}
 }
 \value{
 List of ggplot2 elements
@@ -109,7 +108,7 @@ standard list manipulation.
    \strong{ggplot2 element} \tab \strong{Comment} \cr
    \code{aes(y = set)} \tab Sets are placed on the y-axis \cr
    \code{geom_bar(bar_aes)} \tab If \code{fill = NULL}, \code{bar_aes} is the call to \code{aes()} otherwise it is \code{aes(fill = !!sym(fill))}. This object is created internally by \code{default_set_layers()} \cr
-   \code{geom_text(aes(x = n, label = f(n)), hjust = hjust, size = size)} \tab Adds set totals using the labelling function provided as \code{f}. A data.frame is created when calling \code{simpleUpSet} which summarises set totals as the column \code{n} \cr
+   \code{geom_text(aes(x = size, label = f(size)), hjust = hjust, size = label_size)} \tab Adds set totals using the labelling function provided as \code{f}. A data.frame is created when calling \code{simpleUpSet} which summarises set totals as the column \code{size} \cr
    \code{scale_x_reverse(expand = c(expand, 0, 0, 0), name = name, labels = f)} \tab Ensures bars go in reverse order along the x-axis, with the expansion providing room for set totals \cr
    \code{scale_y_discrete(position = "right", name = NULL, labels = NULL)} \tab Tidies up the y-axis with set names \cr
    \code{theme(axis.text.y.right = element_text(hjust = 0.5), axis.ticks.y.right = element_blank(), margins = margin(5.5, 0, 5.5, 5.5))} \tab Ensures margins and tick marks are suitable for the UpSet layout \cr
@@ -121,7 +120,7 @@ standard list manipulation.
    \strong{ggplot2 element} \tab \strong{Comment} \cr
    \code{aes(x = intersect)} \tab Intersections are placed along the x-axis \cr
    \code{geom_bar(bar_aes)} \tab If \code{fill = NULL}, \code{bar_aes} is the call to \code{aes()} otherwise it is \code{aes(fill = !!sym(fill))}. This object is created internally by \code{default_intersect_layers()} \cr
-   \code{geom_text(aes(y = n, label = f(n)), vjust = vjust, size = size)} \tab Adds intersection totals using the labelling function provided as \code{f}. A data.frame is created when calling \code{simpleUpSet} which summarises intersection totals as the column \code{n} \cr
+   \code{geom_text(aes(y = size, label = f(size)), vjust = vjust, size = label_size)} \tab Adds intersection totals using the labelling function provided as \code{f}. A data.frame is created when calling \code{simpleUpSet} which summarises intersection totals as the column \code{size} \cr
    \code{scale_x_discrete(name = NULL, labels = NULL)} \tab Tidies up the x-axis, hiding intersection names \cr
    \code{scale_y_continuous(name = name, expand = c(0, 0, expand, 0), labels = f)} \tab Standard y-axis with name provided and with the expansion able to be easily set to accommodate labels \cr
    \code{theme(axis.ticks.x.bottom = element_blank(), margins = margin(5.5, 5.5, 0, 0))} \tab Ensures margins and tick marks are suitable for the UpSet layout \cr

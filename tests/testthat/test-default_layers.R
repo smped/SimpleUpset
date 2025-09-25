@@ -16,7 +16,7 @@ test_that("default_sets_layer behaves as expected", {
   expect_equal(unname(set_list[[2]]$aes_params), list())
   expect_equal(
     vapply(set_list[[3]]$mapping, as_label, character(1)),
-    c(x = "n", label = "f(n)")
+    c(x = "size", label = "f(size)")
   )
   expect_equal(
     unlist(set_list[[3]]$aes_params), c(hjust = 1.1, size = 3.5)
@@ -67,7 +67,7 @@ test_that("default_intersect_layers behaves as expected", {
   expect_equal(unname(intersect_list[[2]]$aes_params), list())
   expect_equal(
     vapply(intersect_list[[3]]$mapping, as_label, character(1)),
-    c(y = "n", label = "f(n)")
+    c(y = "size", label = "f(size)")
   )
   expect_equal(
     unlist(intersect_list[[3]]$aes_params), c(vjust = -0.5, size = 3.5)
