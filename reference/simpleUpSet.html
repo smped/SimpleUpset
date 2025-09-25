@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimpleUpset</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.4</span>
       </span>
     </div>
 
@@ -66,9 +66,8 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">simpleUpSet</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  sets <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  sort_sets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ascending"</span>, <span class="st">"descending"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
-<span>  sort_intersect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"descending"</span>, <span class="st">"ascending"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
-<span>  intersect_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"size"</span>, <span class="st">"degree"</span>, <span class="st">"set"</span><span class="op">)</span>,</span>
+<span>  sort_sets <span class="op">=</span> <span class="va">n</span>,</span>
+<span>  sort_intersect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">desc</span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, <span class="va">degree</span><span class="op">)</span>,</span>
 <span>  n_intersect <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  min_size <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  min_degree <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -102,15 +101,17 @@
 
 
 <dt id="arg-sort-sets">sort_sets<a class="anchor" aria-label="anchor" href="#arg-sort-sets"></a></dt>
-<dd><p>Can be "ascending", "descending", "none"</p></dd>
+<dd><p>&lt;<code><a href="https://rlang.r-lib.org/reference/args_data_masking.html" class="external-link">data-masking</a></code>&gt; specification
+for set order, using variables such as n, desc(n) or NULL. Passed internally
+to <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">dplyr::arrange()</a></code>.
+The only possible column to call is 'n'</p></dd>
 
 
 <dt id="arg-sort-intersect">sort_intersect<a class="anchor" aria-label="anchor" href="#arg-sort-intersect"></a></dt>
-<dd><p>Can be "ascending", "descending", "none"</p></dd>
-
-
-<dt id="arg-intersect-by">intersect_by<a class="anchor" aria-label="anchor" href="#arg-intersect-by"></a></dt>
-<dd><p>Sort intersections by size, degree or set</p></dd>
+<dd><p>list of &lt;<code><a href="https://rlang.r-lib.org/reference/args_data_masking.html" class="external-link">data-masking</a></code>&gt;
+specifications for intersection order. Passed internally to
+<code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">dplyr::arrange()</a></code>. The available columns are 'n', degree' and 'set' Any
+other column names will cause an error.</p></dd>
 
 
 <dt id="arg-n-intersect">n_intersect<a class="anchor" aria-label="anchor" href="#arg-n-intersect"></a></dt>
