@@ -189,8 +189,8 @@ scales, themes etc are easily visible by passing the argument,
 begin customisation from a low level.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/default-layers.html">default_set_layers</a></span><span class="op">(</span>dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; list(aes(y = set), geom_bar(bar_aes), geom_text(aes(x = n, label = f(n)), </span></span>
-<span><span class="co">#&gt;     hjust = hjust, size = size), scale_x_reverse(expand = c(expand, </span></span>
+<span><span class="co">#&gt; list(aes(y = set), geom_bar(bar_aes), geom_text(aes(x = size, </span></span>
+<span><span class="co">#&gt;     label = f(size)), hjust = hjust, size = label_size), scale_x_reverse(expand = c(expand, </span></span>
 <span><span class="co">#&gt;     0, 0, 0), name = name, labels = f), scale_y_discrete(position = "right", </span></span>
 <span><span class="co">#&gt;     name = NULL, labels = NULL), theme(axis.text.y.right = element_text(hjust = 0.5), </span></span>
 <span><span class="co">#&gt;     axis.ticks.y.right = element_blank(), margins = margin(5.5, </span></span>

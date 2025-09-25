@@ -69,7 +69,7 @@
 <span>  f <span class="op">=</span> <span class="va">comma</span>,</span>
 <span>  expand <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>  hjust <span class="op">=</span> <span class="fl">1.1</span>,</span>
-<span>  size <span class="op">=</span> <span class="fl">3.5</span>,</span>
+<span>  label_size <span class="op">=</span> <span class="fl">3.5</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"Set Size"</span>,</span>
 <span>  dry_run <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
@@ -80,7 +80,7 @@
 <span>  f <span class="op">=</span> <span class="va">comma</span>,</span>
 <span>  expand <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  vjust <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>,</span>
-<span>  size <span class="op">=</span> <span class="fl">3.5</span>,</span>
+<span>  label_size <span class="op">=</span> <span class="fl">3.5</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"Intersection Size"</span>,</span>
 <span>  dry_run <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
@@ -125,9 +125,8 @@ the main data object</p></dd>
 either set or intersection sizes</p></dd>
 
 
-<dt id="arg-size">size<a class="anchor" aria-label="anchor" href="#arg-size"></a></dt>
-<dd><p>Passed to labels for sets and intersections, and to point sizes
-for the intersections matrix</p></dd>
+<dt id="arg-label-size">label_size<a class="anchor" aria-label="anchor" href="#arg-label-size"></a></dt>
+<dd><p>Passed to labels for sets and intersections</p></dd>
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
@@ -150,8 +149,8 @@ intersections matrix</p></dd>
 both non-empty intersections and segments (dark)</p></dd>
 
 
-<dt id="arg-shape">shape<a class="anchor" aria-label="anchor" href="#arg-shape"></a></dt>
-<dd><p>Point shape passed to the intersections matrix</p></dd>
+<dt id="arg-shape-size">shape, size<a class="anchor" aria-label="anchor" href="#arg-shape-size"></a></dt>
+<dd><p>Point shape/size passed to the intersections matrix</p></dd>
 
 </dl></div>
     <div id="value">
@@ -183,11 +182,11 @@ these additional elements will automatically be placed after the defaults.
 Importantly, these will be created as lists, then can be re-ordered using
 standard list manipulation.</p><div class="section">
 <h3 id="default-layers-for-sets">Default Layers For Sets<a class="anchor" aria-label="anchor" href="#default-layers-for-sets"></a></h3>
-<table class="table table"><tr><td><strong>ggplot2 element</strong></td><td><strong>Comment</strong></td></tr><tr><td><code>aes(y = set)</code></td><td>Sets are placed on the y-axis</td></tr><tr><td><code>geom_bar(bar_aes)</code></td><td>If <code>fill = NULL</code>, <code>bar_aes</code> is the call to <code>aes()</code> otherwise it is <code>aes(fill = !!sym(fill))</code>. This object is created internally by <code>default_set_layers()</code></td></tr><tr><td><code>geom_text(aes(x = n, label = f(n)), hjust = hjust, size = size)</code></td><td>Adds set totals using the labelling function provided as <code>f</code>. A data.frame is created when calling <code>simpleUpSet</code> which summarises set totals as the column <code>n</code></td></tr><tr><td><code>scale_x_reverse(expand = c(expand, 0, 0, 0), name = name, labels = f)</code></td><td>Ensures bars go in reverse order along the x-axis, with the expansion providing room for set totals</td></tr><tr><td><code>scale_y_discrete(position = "right", name = NULL, labels = NULL)</code></td><td>Tidies up the y-axis with set names</td></tr><tr><td><code>theme(axis.text.y.right = element_text(hjust = 0.5), axis.ticks.y.right = element_blank(), margins = margin(5.5, 0, 5.5, 5.5))</code></td><td>Ensures margins and tick marks are suitable for the UpSet layout</td></tr></table></div>
+<table class="table table"><tr><td><strong>ggplot2 element</strong></td><td><strong>Comment</strong></td></tr><tr><td><code>aes(y = set)</code></td><td>Sets are placed on the y-axis</td></tr><tr><td><code>geom_bar(bar_aes)</code></td><td>If <code>fill = NULL</code>, <code>bar_aes</code> is the call to <code>aes()</code> otherwise it is <code>aes(fill = !!sym(fill))</code>. This object is created internally by <code>default_set_layers()</code></td></tr><tr><td><code>geom_text(aes(x = size, label = f(size)), hjust = hjust, size = label_size)</code></td><td>Adds set totals using the labelling function provided as <code>f</code>. A data.frame is created when calling <code>simpleUpSet</code> which summarises set totals as the column <code>size</code></td></tr><tr><td><code>scale_x_reverse(expand = c(expand, 0, 0, 0), name = name, labels = f)</code></td><td>Ensures bars go in reverse order along the x-axis, with the expansion providing room for set totals</td></tr><tr><td><code>scale_y_discrete(position = "right", name = NULL, labels = NULL)</code></td><td>Tidies up the y-axis with set names</td></tr><tr><td><code>theme(axis.text.y.right = element_text(hjust = 0.5), axis.ticks.y.right = element_blank(), margins = margin(5.5, 0, 5.5, 5.5))</code></td><td>Ensures margins and tick marks are suitable for the UpSet layout</td></tr></table></div>
 
 <div class="section">
 <h3 id="default-layers-for-intersections">Default Layers For Intersections<a class="anchor" aria-label="anchor" href="#default-layers-for-intersections"></a></h3>
-<table class="table table"><tr><td><strong>ggplot2 element</strong></td><td><strong>Comment</strong></td></tr><tr><td><code>aes(x = intersect)</code></td><td>Intersections are placed along the x-axis</td></tr><tr><td><code>geom_bar(bar_aes)</code></td><td>If <code>fill = NULL</code>, <code>bar_aes</code> is the call to <code>aes()</code> otherwise it is <code>aes(fill = !!sym(fill))</code>. This object is created internally by <code>default_intersect_layers()</code></td></tr><tr><td><code>geom_text(aes(y = n, label = f(n)), vjust = vjust, size = size)</code></td><td>Adds intersection totals using the labelling function provided as <code>f</code>. A data.frame is created when calling <code>simpleUpSet</code> which summarises intersection totals as the column <code>n</code></td></tr><tr><td><code>scale_x_discrete(name = NULL, labels = NULL)</code></td><td>Tidies up the x-axis, hiding intersection names</td></tr><tr><td><code>scale_y_continuous(name = name, expand = c(0, 0, expand, 0), labels = f)</code></td><td>Standard y-axis with name provided and with the expansion able to be easily set to accommodate labels</td></tr><tr><td><code>theme(axis.ticks.x.bottom = element_blank(), margins = margin(5.5, 5.5, 0, 0))</code></td><td>Ensures margins and tick marks are suitable for the UpSet layout</td></tr></table></div>
+<table class="table table"><tr><td><strong>ggplot2 element</strong></td><td><strong>Comment</strong></td></tr><tr><td><code>aes(x = intersect)</code></td><td>Intersections are placed along the x-axis</td></tr><tr><td><code>geom_bar(bar_aes)</code></td><td>If <code>fill = NULL</code>, <code>bar_aes</code> is the call to <code>aes()</code> otherwise it is <code>aes(fill = !!sym(fill))</code>. This object is created internally by <code>default_intersect_layers()</code></td></tr><tr><td><code>geom_text(aes(y = size, label = f(size)), vjust = vjust, size = label_size)</code></td><td>Adds intersection totals using the labelling function provided as <code>f</code>. A data.frame is created when calling <code>simpleUpSet</code> which summarises intersection totals as the column <code>size</code></td></tr><tr><td><code>scale_x_discrete(name = NULL, labels = NULL)</code></td><td>Tidies up the x-axis, hiding intersection names</td></tr><tr><td><code>scale_y_continuous(name = name, expand = c(0, 0, expand, 0), labels = f)</code></td><td>Standard y-axis with name provided and with the expansion able to be easily set to accommodate labels</td></tr><tr><td><code>theme(axis.ticks.x.bottom = element_blank(), margins = margin(5.5, 5.5, 0, 0))</code></td><td>Ensures margins and tick marks are suitable for the UpSet layout</td></tr></table></div>
 
 <div class="section">
 <h3 id="default-layers-for-intersections-matrix-i-e-grid-">Default Layers For Intersections Matrix (i.e. Grid)<a class="anchor" aria-label="anchor" href="#default-layers-for-intersections-matrix-i-e-grid-"></a></h3>
@@ -199,8 +198,8 @@ standard list manipulation.</p><div class="section">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># View the un-evaluated list of default layers for the sets</span></span></span>
 <span class="r-in"><span><span class="fu">default_set_layers</span><span class="op">(</span>dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> list(aes(y = set), geom_bar(bar_aes), geom_text(aes(x = n, label = f(n)), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     hjust = hjust, size = size), scale_x_reverse(expand = c(expand, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> list(aes(y = set), geom_bar(bar_aes), geom_text(aes(x = size, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     label = f(size)), hjust = hjust, size = label_size), scale_x_reverse(expand = c(expand, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     0, 0, 0), name = name, labels = f), scale_y_discrete(position = "right", </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     name = NULL, labels = NULL), theme(axis.text.y.right = element_text(hjust = 0.5), </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     axis.ticks.y.right = element_blank(), margins = margin(5.5, </span>
