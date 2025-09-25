@@ -37,7 +37,7 @@
 #' | :------------------ | :---------- |
 #' | `aes(y = set)` | Sets are placed on the y-axis |
 #' | `geom_bar(bar_aes)` | If `fill = NULL`, `bar_aes` is the call to `aes()` otherwise it is `aes(fill = !!sym(fill))`. This object is created internally by `default_set_layers()` |
-#' | `geom_text(aes(x = n, label = f(n)), hjust = hjust, size = size)` | Adds set totals using the labelling function provided as `f`. A data.frame is created when calling `simpleUpSet` which summarises set totals as the column `n` |
+#' | `geom_text(aes(x = size, label = f(size)), hjust = hjust, size = label_size)` | Adds set totals using the labelling function provided as `f`. A data.frame is created when calling `simpleUpSet` which summarises set totals as the column `size` |
 #' | `scale_x_reverse(expand = c(expand, 0, 0, 0), name = name, labels = f)` | Ensures bars go in reverse order along the x-axis, with the expansion providing room for set totals |
 #' | `scale_y_discrete(position = "right", name = NULL, labels = NULL)` | Tidies up the y-axis with set names |
 #' | `theme(axis.text.y.right = element_text(hjust = 0.5), axis.ticks.y.right = element_blank(), margins = margin(5.5, 0, 5.5, 5.5))` | Ensures margins and tick marks are suitable for the UpSet layout |
@@ -48,7 +48,7 @@
 #' | :------------------ | :---------- |
 #' | `aes(x = intersect)` | Intersections are placed along the x-axis |
 #' | `geom_bar(bar_aes)` | If `fill = NULL`, `bar_aes` is the call to `aes()` otherwise it is `aes(fill = !!sym(fill))`. This object is created internally by `default_intersect_layers()` |
-#' | `geom_text(aes(y = n, label = f(n)), vjust = vjust, size = size)` | Adds intersection totals using the labelling function provided as `f`. A data.frame is created when calling `simpleUpSet` which summarises intersection totals as the column `n` |
+#' | `geom_text(aes(y = size, label = f(size)), vjust = vjust, size = label_size)` | Adds intersection totals using the labelling function provided as `f`. A data.frame is created when calling `simpleUpSet` which summarises intersection totals as the column `size` |
 #' | `scale_x_discrete(name = NULL, labels = NULL)` | Tidies up the x-axis, hiding intersection names |
 #' | `scale_y_continuous(name = name, expand = c(0, 0, expand, 0), labels = f)` | Standard y-axis with name provided and with the expansion able to be easily set to accommodate labels |
 #' | `theme(axis.ticks.x.bottom = element_blank(), margins = margin(5.5, 5.5, 0, 0))` | Ensures margins and tick marks are suitable for the UpSet layout |
@@ -80,9 +80,8 @@
 #' included as part of a dry_run
 #' @param light,dark default colours for empty intersections (light) and for
 #' both non-empty intersections and segments (dark)
-#' @param shape Point shape passed to the intersections matrix
-#' @param size Passed to labels for sets and intersections, and to point sizes
-#' for the intersections matrix
+#' @param shape,size Point shape/size passed to the intersections matrix
+#' @param label_size Passed to labels for sets and intersections
 #' @param hjust,vjust Passed to respective elements for simple adjustment of
 #' either set or intersection sizes
 #'
@@ -105,7 +104,7 @@
 #' @export
 #' @rdname default-layers
 default_set_layers <- function(
-    ..., fill = NULL, f = comma, expand = 0.2, hjust = 1.1, size = 3.5,
+    ..., fill = NULL, f = comma, expand = 0.2, hjust = 1.1, label_size = 3.5,
     name = "Set Size", dry_run = FALSE
 ){
 
@@ -125,7 +124,7 @@ default_set_layers <- function(
     list(
       aes(y = set),
       geom_bar(bar_aes),
-      geom_text(aes(x = n, label = f(n)), hjust = hjust, size = size),
+      geom_text(aes(x = size, label = f(size)), hjust = hjust, size = label_size),
       scale_x_reverse(expand = c(expand, 0, 0, 0), name = name, labels = f),
       scale_y_discrete(position = "right", name = NULL, labels = NULL),
       theme(
@@ -147,7 +146,7 @@ default_set_layers <- function(
 #' @export
 #' @rdname default-layers
 default_intersect_layers <- function(
-    ..., fill = NULL, f = comma, expand = 0.05, vjust = -0.5, size = 3.5,
+    ..., fill = NULL, f = comma, expand = 0.05, vjust = -0.5, label_size = 3.5,
     name = "Intersection Size", dry_run = FALSE
 ){
 
@@ -167,7 +166,7 @@ default_intersect_layers <- function(
     list(
       aes(x = intersect),
       geom_bar(bar_aes),
-      geom_text(aes(y = n, label = f(n)), vjust = vjust, size = size),
+      geom_text(aes(y = size, label = f(size)), vjust = vjust, size = label_size),
       scale_x_discrete(name = NULL, labels = NULL),
       scale_y_continuous(name = name, expand = c(0, 0, expand, 0), labels = f),
       theme(

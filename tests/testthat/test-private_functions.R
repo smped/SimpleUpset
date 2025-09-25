@@ -1,7 +1,7 @@
 
 test_that(".add_intersections adds & transforms columns", {
   hl <- NULL
-  sort_intersect <- substitute(list(desc(n)))
+  sort_intersect <- substitute(list(desc(size)))
   tbl <- .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl))
   expect_true(all(vapply(tbl[sets], is.logical, logical(1))))
   expect_true(all(colnames(tbl) %in% c(colnames(movies), "intersect", "degree")))
@@ -14,23 +14,23 @@ test_that(".add_intersections adds & transforms columns", {
 test_that("Sorting works as expected", {
   hl <- NULL
 
-  sort_intersect <- substitute(list(desc(n)))
+  sort_intersect <- substitute(list(desc(size)))
   tbl <- .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl))
   expect_true(which.max(table(tbl$intersect)) == 1)
 
-  sort_intersect <- substitute(list(n))
+  sort_intersect <- substitute(list(size))
   tbl <- .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl))
   expect_true(which.max(table(tbl$intersect)) == 27)
 
-  sort_intersect <- substitute(list(desc(degree), desc(n)))
+  sort_intersect <- substitute(list(desc(degree), desc(size)))
   tbl <- .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl))
   expect_true(which.max(table(tbl$intersect)) == 23)
 
-  sort_intersect <- substitute(list(degree, desc(n)))
+  sort_intersect <- substitute(list(degree, desc(size)))
   tbl <- .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl))
   expect_true(table(tbl$intersect)[[5]] == 65)
 
-  sort_intersect <- substitute(desc(n))
+  sort_intersect <- substitute(desc(size))
   expect_error(
     .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl)),
     "Sorting.+"

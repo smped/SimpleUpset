@@ -30,12 +30,12 @@
 #' @param x Input data frame
 #' @param sets Character vector listing columns of x to plot
 #' @param sort_sets <[`data-masking`][rlang::args_data_masking]> specification
-#' for set order, using variables such as n, desc(n) or NULL. Passed internally
+#' for set order, using variables such as size, desc(size) or NULL. Passed internally
 #' to [dplyr::arrange()].
-#' The only possible column to call is 'n'
+#' The only possible column to call is 'size'
 #' @param sort_intersect list of <[`data-masking`][rlang::args_data_masking]>
 #' specifications for intersection order. Passed internally to
-#' [dplyr::arrange()]. The available columns are 'n', degree' and 'set' Any
+#' [dplyr::arrange()]. The available columns are 'size', degree' and 'set' Any
 #' other column names will cause an error.
 #' @param n_intersect Maximum number of intersections to show
 #' @param min_size Only show intersections larger than this value
@@ -114,8 +114,8 @@
 simpleUpSet <- function(
     x,
     sets = NULL,
-    sort_sets = n,
-    sort_intersect = list(desc(n), degree),
+    sort_sets = size,
+    sort_intersect = list(desc(size), degree),
     n_intersect = 20, min_size = 0,
     min_degree = 1, max_degree = length(sets),
     set_layers = default_set_layers(),
@@ -308,10 +308,10 @@ simpleUpSet <- function(
 
   ## The totals summarised by intersect (ignoring any fill columns)
   totals_df <- summarise(
-    tbl, n = dplyr::n(), .by = any_of(c("intersect", "degree"))
+    tbl, size = dplyr::n(), .by = any_of(c("intersect", "degree"))
   )
   totals_df <- dplyr::filter(
-    totals_df, n > min_size, degree >= min_degree, degree <= max_degree
+    totals_df, size > min_size, degree >= min_degree, degree <= max_degree
   )
   totals_df <- dplyr::arrange(totals_df, intersect)
   totals_df <- dplyr::slice(totals_df, seq_len(n_intersect))
@@ -346,7 +346,7 @@ simpleUpSet <- function(
 .get_set_levels <- function(tbl, sets, sort_sets, na.rm) {
 
   sum_tbl <- summarise(tbl, across(all_of(sets), \(x) sum(x, na.rm = na.rm)))
-  sum_tbl <- pivot_longer(sum_tbl, everything(), names_to = "set", values_to = "n")
+  sum_tbl <- pivot_longer(sum_tbl, everything(), names_to = "set", values_to = "size")
   if (!quo_is_null(sort_sets)) sum_tbl <- arrange(sum_tbl, !!sort_sets)
   set_levels <- sum_tbl$set
 
@@ -386,7 +386,7 @@ simpleUpSet <- function(
   ## Calculate set totals for optional labels
   col_sums <- colSums(tbl[sets])
   counts_tbl <- data.frame(
-    set = factor(names(col_sums), levels = sets), n = col_sums
+    set = factor(names(col_sums), levels = sets), size = col_sums
   )
   ## Check for labels
   is_labels <- vapply(
@@ -451,7 +451,7 @@ simpleUpSet <- function(
   }
 
   ## Determine the intersect number to a column in the original
-  set_tbl <- summarise(x, n = dplyr::n(), .by = c(all_of(sets)))
+  set_tbl <- summarise(x, size = dplyr::n(), .by = c(all_of(sets)))
   set_tbl$degree <- rowSums(set_tbl[sets])
   set_tbl$temp <- seq_len(nrow(set_tbl))
 
@@ -465,14 +465,14 @@ simpleUpSet <- function(
     set_tbl <- arrange(set_tbl, !!!as.list(sort_expr[-1]))
     set_tbl <- pivot_wider(
       set_tbl, names_from = "set", values_from = "value",
-      id_cols = any_of(c("temp", "n", "degree", "highlight"))
+      id_cols = any_of(c("temp", "size", "degree", "highlight"))
     )
   }
 
 
   ## Add the intersection id & remove the temp columns
   set_tbl$intersect <- as.factor(seq_len(nrow(set_tbl)))
-  set_tbl$n <- set_tbl$temp <- NULL
+  set_tbl$size <- set_tbl$temp <- NULL
 
   ## Return the original table with intersect numbers & logical columns
   left_join(x, set_tbl, by = sets)
