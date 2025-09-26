@@ -66,12 +66,31 @@
 #' | `guides(colour = guide_none())` | By default, don't include a legend for any optionally coloured points |
 #' | `theme(margins = margin(5.5, 5.5, 5.5, 0), axis.text.y = element_text(hjust = 0.5), axis.ticks = element_blank())` | Ensures margins, text and tick marks are suitable for the UpSet layout |
 #'
+#' ## Panel Internals
+#'
+#' Internally, the supplied data.frame has the additional columns 'intersect',
+#' 'degree' added, along with the optional 'highlight' column.
+#' This object is used to directly create bars using `geom_bar()` and as such,
+#' any of the additional columns can be passed to `geom_bar()` as sorting options.
+#' These additional columns, along with any existing columns in the original
+#' data can be used as mapping aesthetics where relevant.
+#'
+#' For both the sets and intersection totals (i.e. labels), separate tables are
+#' created specifically for printing totals at the top (or left) of each bar,
+#' and these tables are specifically passed to those layers.
+#' Totals are included as 'size' and the proportion of all intersections is
+#' also included as the column 'prop' for both the sets and intersections panel.
+#' Whilst default labels are added using 'size', changing this to 'prop' and
+#' using [scales::percent()] will work and is supported.
+#'
 #' @param fill Column to fill set bars by. Can be 'set' or another column within
 #' the main data object
 #' @param colour Primarily used for highlighting points and segments in the
 #' intersections matrix
-#' @param f Function for labelling set sizes and the set x-axis
-#' @param expand axis expansion
+#' @param labels Choose either size or prop to label bars with totals or the
+#' proportion of all intersections
+#' @param f Function for labelling set or intersection sizes sizes
+#' @param expand Multiplicative axis expansion passed to [expansion()]
 #' @param name Main axis title
 #' @param ... additional layers to include alongside default layers.
 #' Will be added after the default layers
@@ -104,8 +123,8 @@
 #' @export
 #' @rdname default-layers
 default_set_layers <- function(
-    ..., fill = NULL, f = comma, expand = 0.2, hjust = 1.1, label_size = 3.5,
-    name = "Set Size", dry_run = FALSE
+    ..., fill = NULL, labels = "size", f = comma, expand = c(0.2, 0), hjust = 1.1,
+    label_size = 3.5, name = "Set Size", dry_run = FALSE
 ){
 
   bar_aes <- aes()
@@ -124,8 +143,10 @@ default_set_layers <- function(
     list(
       aes(y = set),
       geom_bar(bar_aes),
-      geom_text(aes(x = size, label = f(size)), hjust = hjust, size = label_size),
-      scale_x_reverse(expand = c(expand, 0, 0, 0), name = name, labels = f),
+      geom_text(
+        aes(x = size, label = f(!!sym(labels))), hjust = hjust, size = label_size
+      ),
+      scale_x_reverse(expand = expansion(expand), name = name, labels = comma),
       scale_y_discrete(position = "right", name = NULL, labels = NULL),
       theme(
         axis.text.y.right = element_text(hjust = 0.5),
@@ -146,8 +167,9 @@ default_set_layers <- function(
 #' @export
 #' @rdname default-layers
 default_intersect_layers <- function(
-    ..., fill = NULL, f = comma, expand = 0.05, vjust = -0.5, label_size = 3.5,
-    name = "Intersection Size", dry_run = FALSE
+    ..., fill = NULL, labels = "size", f = comma, expand = c(0, 0.05),
+    vjust = -0.5, label_size = 3.5, name = "Intersection Size",
+    dry_run = FALSE
 ){
 
   bar_aes <- aes()
@@ -166,9 +188,11 @@ default_intersect_layers <- function(
     list(
       aes(x = intersect),
       geom_bar(bar_aes),
-      geom_text(aes(y = size, label = f(size)), vjust = vjust, size = label_size),
+      geom_text(
+        aes(y = size, label = f(!!sym(labels))), vjust = vjust, size = label_size
+      ),
       scale_x_discrete(name = NULL, labels = NULL),
-      scale_y_continuous(name = name, expand = c(0, 0, expand, 0), labels = f),
+      scale_y_continuous(name = name, expand = expansion(expand), labels = comma),
       theme(
         axis.ticks.x.bottom = element_blank(),
         margins = margin(5.5, 5.5, 0, 0)

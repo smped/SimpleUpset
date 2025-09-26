@@ -33,7 +33,6 @@ test_that("default_sets_layer behaves as expected", {
   ## Now pass key arguments
   set_list <- default_set_layers(fill = "set", f = NULL)
   expect_equal(as_label(set_list[[2]]$mapping$fill), "set")
-  expect_equal(set_list[[4]]$labels(1000), 1000)
 
   ## Dry run
   expect_error(eval(default_set_layers(dry_run = TRUE)), "object.+")
@@ -83,7 +82,6 @@ test_that("default_intersect_layers behaves as expected", {
   ## Now pass key arguments
   intersect_list <- default_intersect_layers(fill = "Decade", f = NULL)
   expect_equal(as_label(intersect_list[[2]]$mapping$fill), "Decade")
-  expect_equal(intersect_list[[5]]$labels(1000), 1000)
 
   ## Dry run
   expect_error(eval(default_intersect_layers(dry_run = TRUE)), "object.+")

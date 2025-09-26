@@ -321,6 +321,7 @@ simpleUpSet <- function(
   totals_df <- dplyr::arrange(totals_df, intersect)
   totals_df <- dplyr::slice(totals_df, seq_len(n_intersect))
   totals_df$intersect <- droplevels(totals_df$intersect)
+  totals_df$prop <- totals_df$size / nrow(tbl)
   tbl <- dplyr::filter(tbl, intersect %in% levels(totals_df$intersect))
   if ("degree" %in% colnames(tbl)) tbl$degree <- as.factor(tbl$degree)
 
@@ -353,16 +354,8 @@ simpleUpSet <- function(
   sum_tbl <- summarise(tbl, across(all_of(sets), \(x) sum(x, na.rm = na.rm)))
   sum_tbl <- pivot_longer(sum_tbl, everything(), names_to = "set", values_to = "size")
   if (!quo_is_null(sort_sets)) sum_tbl <- arrange(sum_tbl, !!sort_sets)
-  set_levels <- sum_tbl$set
+  sum_tbl$set
 
-  # ## Get the set levels
-  # col_sums <- colSums(tbl[sets])
-  # set_levels <- sets
-  # if (sort_sets != "none") {
-  #   sort_lgl <- sort_sets == "descending"
-  #   set_levels <- names(sort(col_sums, decreasing = sort_lgl))
-  # }
-  set_levels
 }
 
 #' @importFrom dplyr across summarise
@@ -388,10 +381,11 @@ simpleUpSet <- function(
   sets_tbl <- sets_tbl[sets_tbl$value,]
   sets_tbl$set <- factor(sets_tbl$set, sets)
 
-  ## Calculate set totals for optional labels
+  ## Calculate set totals & proportions for optional labels
   col_sums <- colSums(tbl[sets])
-  counts_tbl <- data.frame(
-    set = factor(names(col_sums), levels = sets), size = col_sums
+  totals_df <- data.frame(
+    set = factor(names(col_sums), levels = sets),
+    size = col_sums, prop = col_sums / nrow(tbl)
   )
   ## Check for labels
   is_labels <- vapply(
@@ -401,7 +395,7 @@ simpleUpSet <- function(
     }, logical(1)
   )
 
-  for (i in which(is_labels)) layers[[i]]$data <- counts_tbl
+  for (i in which(is_labels)) layers[[i]]$data <- totals_df
 
   ## The main plot
   stripe_geom <- .bg_stripes(sets, stripe_colours)

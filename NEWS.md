@@ -1,3 +1,7 @@
+# SimpleUpset 0.0.6
+
+* Included the ability to add proportions instead of totals as bar labels
+
 # SimpleUpset 0.0.5
 
 * Added highlight_levels for finer control of highlighting
