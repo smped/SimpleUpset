@@ -123,7 +123,7 @@ These can be used as templates to full customisation by creating a custom
 list object, or modified directly using the ellipsis
 }
 \examples{
-## Use the movies data from the package UpSetR
+## Use a modified version of the movies data provided with the package UpSetR
 library(tidyverse)
 theme_set(theme_bw())
 sets <- c("Action", "Comedy", "Drama", "Thriller", "Romance")
