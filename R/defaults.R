@@ -71,9 +71,8 @@
 #' Internally, the supplied data.frame has the additional columns 'intersect',
 #' 'degree' added, along with the optional 'highlight' column.
 #' This object is used to directly create bars using `geom_bar()` and as such,
-#' any of the additional columns can be passed to `geom_bar()` as sorting options.
-#' These additional columns, along with any existing columns in the original
-#' data can be used as mapping aesthetics where relevant.
+#' any of the additional columns can be passed to `geom_bar()` as mapping
+#' aesthetics, along with all original columns.
 #'
 #' For both the sets and intersection totals (i.e. labels), separate tables are
 #' created specifically for printing totals at the top (or left) of each bar,
@@ -127,8 +126,8 @@ default_set_layers <- function(
     label_size = 3.5, name = "Set Size", dry_run = FALSE
 ){
 
-  bar_aes <- aes()
-  if (!is.null(fill)) bar_aes$fill <- sym(fill)
+  ## Currently, no NULL handler is setup for labels...
+  if (!is.null(fill)) fill <- sym(fill)
 
   ## Check the labeller
   if (is.null(f)) f <- c
@@ -142,7 +141,7 @@ default_set_layers <- function(
   layers <- expr(
     list(
       aes(y = set),
-      geom_bar(bar_aes),
+      geom_bar(aes(fill = {{ fill }})),
       geom_text(
         aes(x = size, label = f(!!sym(labels))), hjust = hjust, size = label_size
       ),
@@ -172,8 +171,8 @@ default_intersect_layers <- function(
     dry_run = FALSE
 ){
 
-  bar_aes <- aes()
-  if (!is.null(fill)) bar_aes$fill <- sym(fill)
+  ## Currently, no NULL handler is setup for labels...
+  if (!is.null(fill)) fill <- sym(fill)
 
   ## Check the labeller
   if (is.null(f)) f <- c
@@ -187,7 +186,7 @@ default_intersect_layers <- function(
   layers <- expr(
     list(
       aes(x = intersect),
-      geom_bar(bar_aes),
+      geom_bar(aes(fill = {{ fill }})),
       geom_text(
         aes(y = size, label = f(!!sym(labels))), vjust = vjust, size = label_size
       ),
@@ -215,14 +214,14 @@ default_grid_layers <- function(
     shape = 19, size = 4, name = NULL, dry_run = FALSE
 ){
 
+  if (!is.null(fill)) fill <- sym(fill)
+  if (!is.null(colour)) colour <- sym(colour)
+
   ## Set aesthetics manually before producing complete layers
-  points_aes <- aes()
-  segment_aes <- aes(y = !!sym("y_min"), yend = !!sym("y_max"))
-  if (!is.null(colour)) {
-    points_aes$colour <- sym(colour)
-    segment_aes$colour <- sym(colour)
-  }
-  if (!is.null(fill)) points_aes$fill <- sym(fill)
+  points_aes <- aes(colour = {{ colour }}, fill = {{ fill }})
+  segment_aes <- aes(
+    y = !!sym("y_min"), yend = !!sym("y_max"), colour = {{ colour }}
+  )
 
   ## Check all dotargs for validity
   dot_list <- list(...)
@@ -233,9 +232,9 @@ default_grid_layers <- function(
     list(
       aes(x = intersect, y = set),
       if (!is.null(colour)) {
-        geom_point(mapping = points_aes, size = size, shape = shape)
+        geom_point(points_aes, size = size, shape = shape)
       } else {
-        geom_point(mapping = points_aes, size = size, shape = shape, colour = dark)
+        geom_point(points_aes, size = size, shape = shape, colour = dark)
       },
       geom_point(size = size, shape = shape, colour = light), # Empty intersections
       if (!is.null(colour)) geom_segment(segment_aes) else geom_segment(segment_aes, colour = dark),

@@ -118,7 +118,7 @@ test_that("default_grid_layers behaves as expected", {
   ## Correctly passed variables
   ## Main points
   expect_true(is_mapping(grid_list[[2]]$mapping))
-  expect_equal(length(grid_list[[2]]$mapping), 0)
+  expect_equal(length(grid_list[[2]]$mapping), 2)
   expect_equal(
     grid_list[[2]]$aes_params, list(size = 4, shape = 19, colour = "grey23")
   )
@@ -130,7 +130,7 @@ test_that("default_grid_layers behaves as expected", {
   ## Segments
   expect_equal(
     vapply(grid_list[[4]]$mapping, as_label, character(1)),
-    c(y = "y_min", yend = "y_max")
+    c(y = "y_min", yend = "y_max", colour = "NULL")
   )
   expect_equal(grid_list[[4]]$aes_params$colour, "grey23")
   ## Axes

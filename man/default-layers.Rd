@@ -152,9 +152,8 @@ standard list manipulation.
 Internally, the supplied data.frame has the additional columns 'intersect',
 'degree' added, along with the optional 'highlight' column.
 This object is used to directly create bars using \code{geom_bar()} and as such,
-any of the additional columns can be passed to \code{geom_bar()} as sorting options.
-These additional columns, along with any existing columns in the original
-data can be used as mapping aesthetics where relevant.
+any of the additional columns can be passed to \code{geom_bar()} as mapping
+aesthetics, along with all original columns.
 
 For both the sets and intersection totals (i.e. labels), separate tables are
 created specifically for printing totals at the top (or left) of each bar,
