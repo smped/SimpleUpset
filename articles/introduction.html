@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimpleUpset</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
       </span>
     </div>
 
@@ -96,12 +96,12 @@
 UpSet plots <span class="citation">(Lex et al. 2014)</span> remain
 consistently available to the ecosystem of <code>R</code> users. The
 underlying functions are built depending heavily on the package
-infrastructure provided by the <code>tidyverse</code> <span class="citation">(Wickham et al. 2019)</span></p>
-<p>As is commonly used for examples, a modified version of the
-<code>movies</code> data will be used for this set of examples, as
-originally provided in the package <code>UpSetR</code> <span class="citation">(Gehlenborg 2019)</span>. This version of the data has
-a reduced number of categories and also has the decade of release
-included</p>
+infrastructure provided by the <code>tidyverse</code> <span class="citation">(Wickham et al. 2019)</span>.</p>
+<p>A modified version of the <code>movies</code> data will be used for
+this set of examples, based on the file originally provided in the
+package <code>UpSetR</code> <span class="citation">(Gehlenborg
+2019)</span>. This version of the data has a reduced number of
+categories and also has the decade of release included.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">movies</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"movies.tsv.gz"</span>, package <span class="op">=</span> <span class="st">"SimpleUpset"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_tsv</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -197,7 +197,7 @@ begin customisation from a low level.</p>
 <span><span class="co">#&gt;         0, 5.5, 5.5)))</span></span></code></pre></div>
 <p>A more simple strategy is to pass a set of key parameters to each
 function as described on the help page. Any additional layers are
-handled simply by the ellipsis (<code>...</code>)</p>
+handled simply by the ellipsis (<code>...</code>).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/simpleUpSet.html">simpleUpSet</a></span><span class="op">(</span></span>
 <span>  <span class="va">movies</span>, <span class="va">sets</span>, min_size <span class="op">=</span> <span class="fl">20</span>,</span>
@@ -274,7 +274,7 @@ individual set.</p>
 <h2 id="adding-plots-to-upper-panels">Adding Plots to Upper Panels<a class="anchor" aria-label="anchor" href="#adding-plots-to-upper-panels"></a>
 </h2>
 <p>Additional panels can be included using the <code>annotations</code>
-argument</p>
+argument.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Add a simple boxplot</span></span>
 <span><span class="fu"><a href="../reference/simpleUpSet.html">simpleUpSet</a></span><span class="op">(</span></span>
@@ -286,7 +286,7 @@ argument</p>
 <p><img src="introduction_files/figure-html/upset-boxplot-1.png" width="960"></p>
 <p>There is no particular limit to the complexity of the upper panels,
 beyond what is contained within the dataset, or what can be considered
-as useful for communication with readers</p>
+as useful for communication with readers.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/simpleUpSet.html">simpleUpSet</a></span><span class="op">(</span></span>
 <span>  <span class="va">movies</span>, <span class="va">sets</span>, n_intersect <span class="op">=</span> <span class="fl">10</span>,</span>
@@ -320,7 +320,7 @@ as useful for communication with readers</p>
 <em>graphics</em>, <em>grDevices</em>, <em>utils</em>,
 <em>datasets</em>, <em>methods</em> and <em>base</em></p>
 <p><strong>other attached packages:</strong> <em>pander(v.0.6.6)</em>,
-<em>SimpleUpset(v.0.0.6)</em>, <em>patchwork(v.1.3.2)</em>,
+<em>SimpleUpset(v.0.1.0)</em>, <em>patchwork(v.1.3.2)</em>,
 <em>lubridate(v.1.9.4)</em>, <em>forcats(v.1.0.1)</em>,
 <em>stringr(v.1.5.2)</em>, <em>dplyr(v.1.1.4)</em>,
 <em>purrr(v.1.1.0)</em>, <em>readr(v.2.1.5)</em>,
