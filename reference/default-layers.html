@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimpleUpset</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.6</span>
       </span>
     </div>
 
@@ -66,8 +66,9 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">default_set_layers</span><span class="op">(</span></span>
 <span>  <span class="va">...</span>,</span>
 <span>  fill <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  labels <span class="op">=</span> <span class="st">"size"</span>,</span>
 <span>  f <span class="op">=</span> <span class="va">comma</span>,</span>
-<span>  expand <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0</span><span class="op">)</span>,</span>
 <span>  hjust <span class="op">=</span> <span class="fl">1.1</span>,</span>
 <span>  label_size <span class="op">=</span> <span class="fl">3.5</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"Set Size"</span>,</span>
@@ -77,8 +78,9 @@
 <span><span class="fu">default_intersect_layers</span><span class="op">(</span></span>
 <span>  <span class="va">...</span>,</span>
 <span>  fill <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  labels <span class="op">=</span> <span class="st">"size"</span>,</span>
 <span>  f <span class="op">=</span> <span class="va">comma</span>,</span>
-<span>  expand <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.05</span><span class="op">)</span>,</span>
 <span>  vjust <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>,</span>
 <span>  label_size <span class="op">=</span> <span class="fl">3.5</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"Intersection Size"</span>,</span>
@@ -112,12 +114,17 @@ Will be added after the default layers</p></dd>
 the main data object</p></dd>
 
 
+<dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
+<dd><p>Choose either size or prop to label bars with totals or the
+proportion of all intersections</p></dd>
+
+
 <dt id="arg-f">f<a class="anchor" aria-label="anchor" href="#arg-f"></a></dt>
-<dd><p>Function for labelling set sizes and the set x-axis</p></dd>
+<dd><p>Function for labelling set or intersection sizes sizes</p></dd>
 
 
 <dt id="arg-expand">expand<a class="anchor" aria-label="anchor" href="#arg-expand"></a></dt>
-<dd><p>axis expansion</p></dd>
+<dd><p>Multiplicative axis expansion passed to <code><a href="https://ggplot2.tidyverse.org/reference/expansion.html" class="external-link">ggplot2::expansion()</a></code></p></dd>
 
 
 <dt id="arg-hjust-vjust">hjust, vjust<a class="anchor" aria-label="anchor" href="#arg-hjust-vjust"></a></dt>
@@ -192,6 +199,25 @@ standard list manipulation.</p><div class="section">
 <h3 id="default-layers-for-intersections-matrix-i-e-grid-">Default Layers For Intersections Matrix (i.e. Grid)<a class="anchor" aria-label="anchor" href="#default-layers-for-intersections-matrix-i-e-grid-"></a></h3>
 <table class="table table"><tr><td><strong>ggplot2 element</strong></td><td><strong>Comment</strong></td></tr><tr><td><code>aes(x = intersect, y = set)</code></td><td>Defines the grid layout to match the sets and intersections panels</td></tr><tr><td><code>if (!is.null(colour)) geom_point(mapping = points_aes, size = size, shape = shape) else geom_point(mapping = points_aes, size = size, shape = shape, colour = dark)</code></td><td>These points represent the main intersections. In general, colour/fill will only be required if highlighting points and the constant value is removed using an <code>ifelse</code> statement is colour is set as a mapping aesthetic</td></tr><tr><td><code>geom_point(size = size, shape = shape, colour = light)</code></td><td>These points represent the background or empty intersections</td></tr><tr><td><code>if (!is.null(colour)) geom_segment(segment_aes) else geom_segment(segment_aes, colour = dark)</code></td><td>The segments joining intersections, again removing colour if set as an aesthetic mapping</td></tr><tr><td><code>scale_y_discrete(name = NULL)</code></td><td>Ensures the y-axis matches that of the sets panel</td></tr><tr><td><code>scale_x_discrete(name = name, labels = NULL)</code></td><td>Ensures the x-axis matches that of the intersection panel, with an optional name</td></tr><tr><td><code>guides(colour = guide_none())</code></td><td>By default, don't include a legend for any optionally coloured points</td></tr><tr><td><code>theme(margins = margin(5.5, 5.5, 5.5, 0), axis.text.y = element_text(hjust = 0.5), axis.ticks = element_blank())</code></td><td>Ensures margins, text and tick marks are suitable for the UpSet layout</td></tr></table></div>
 
+<div class="section">
+<h3 id="panel-internals">Panel Internals<a class="anchor" aria-label="anchor" href="#panel-internals"></a></h3>
+
+
+<p>Internally, the supplied data.frame has the additional columns 'intersect',
+'degree' added, along with the optional 'highlight' column.
+This object is used to directly create bars using <code>geom_bar()</code> and as such,
+any of the additional columns can be passed to <code>geom_bar()</code> as sorting options.
+These additional columns, along with any existing columns in the original
+data can be used as mapping aesthetics where relevant.</p>
+<p>For both the sets and intersection totals (i.e. labels), separate tables are
+created specifically for printing totals at the top (or left) of each bar,
+and these tables are specifically passed to those layers.
+Totals are included as 'size' and the proportion of all intersections is
+also included as the column 'prop' for both the sets and intersections panel.
+Whilst default labels are added using 'size', changing this to 'prop' and
+using <code><a href="https://scales.r-lib.org/reference/percent_format.html" class="external-link">scales::percent()</a></code> will work and is supported.</p>
+</div>
+
     </div>
 
     <div id="ref-examples">
@@ -199,8 +225,8 @@ standard list manipulation.</p><div class="section">
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># View the un-evaluated list of default layers for the sets</span></span></span>
 <span class="r-in"><span><span class="fu">default_set_layers</span><span class="op">(</span>dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> list(aes(y = set), geom_bar(bar_aes), geom_text(aes(x = size, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     label = f(size)), hjust = hjust, size = label_size), scale_x_reverse(expand = c(expand, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     0, 0, 0), name = name, labels = f), scale_y_discrete(position = "right", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     label = f(size)), hjust = hjust, size = label_size), scale_x_reverse(expand = expansion(expand), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     name = name, labels = comma), scale_y_discrete(position = "right", </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     name = NULL, labels = NULL), theme(axis.text.y.right = element_text(hjust = 0.5), </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     axis.ticks.y.right = element_blank(), margins = margin(5.5, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         0, 5.5, 5.5)))</span>
