@@ -218,7 +218,7 @@ simpleUpSet <- function(
   )
 }
 
-#' @importFrom dplyr distinct summarise anti_join join_by
+#' @importFrom dplyr distinct summarise anti_join join_by left_join
 #' @importFrom rlang !!! syms
 #' @importFrom tidyr pivot_longer complete
 #' @importFrom tidyselect any_of
@@ -244,7 +244,7 @@ simpleUpSet <- function(
 
   sets <-levels(p_sets@data$set)
   ## The grid tbl will contain all intersections
-  df <- p_int@data
+  df <- droplevels(p_int@data)
   groups <- intersect(c(sets, "intersect", "highlight", "degree"), colnames(df))
   grid_tbl <- distinct(df, !!!syms(groups))
   grid_tbl <- pivot_longer(
@@ -254,12 +254,16 @@ simpleUpSet <- function(
   grid_tbl$set <- factor(grid_tbl$set, levels = sets)
   grid_tbl$set_int <- as.integer(grid_tbl$set)
   grid_tbl <- droplevels(grid_tbl)
+  grid_tbl <- left_join(
+    grid_tbl,  distinct(df, !!!syms(c(sets, "intersect", "degree"))),
+    by = join_by(intersect, degree)
+  )
 
   ## For the segments, we only need the outer intersections on the grid
   seg_tbl <- summarise(
     grid_tbl,
     y_max = max(!!sym("set_int")), y_min = min(!!sym("set_int")),
-    .by = any_of(c("intersect", "highlight", "degree"))
+    .by = any_of(c("intersect", "highlight", "degree", sets))
   )
 
   ## These layers are more challenging to wrangle using defaults. However
@@ -448,7 +452,7 @@ simpleUpSet <- function(
       stop("highlight can only be specified as a `case_when() statement")
     x <- mutate(x, highlight = !!hl)
     if (is.null(hl_levels)) hl_levels <- sort(unique(x$highlight))
-    x$highlight <- factor(x$highlight, levels = hl_levels) |> droplevels()
+    x$highlight <- droplevels(factor(x$highlight, levels = hl_levels))
   }
 
   ## Determine the intersect number to a column in the original

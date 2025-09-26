@@ -99,7 +99,7 @@ simpleUpSet(
   ),
   set_layers = default_set_layers(
     fill = "Decade", scale_fill_brewer(palette = "Paired"),
-    guides(fill = guide_none()), expand = 0.3
+    guides(fill = guide_none()), expand = c(0.3, 0)
   )
 )
 ```
@@ -139,6 +139,25 @@ simpleUpSet(
   plot_annotation(title = "Using Highlights") &
   theme(legend.position = "none", plot.title = element_text(hjust = 2/3))
 ```
+
+Alternatively, the complete set of intersections containing any one of the sets 
+can be highlighted simply by filling bars using that individual set.
+
+```{r upset-highlights2}
+simpleUpSet(
+  movies, sets, min_size = 20, 
+  intersect_layers = default_intersect_layers(
+    fill ="Comedy", 
+    scale_fill_manual(values = c("grey23", "blue")), 
+    guides(fill = guide_none())
+  ),
+  grid_layers = default_grid_layers(
+    colour = "Comedy", scale_colour_manual(values = c("grey23", "blue"))
+  )
+)
+```
+
+
 
 ## Adding Plots to Upper Panels
 

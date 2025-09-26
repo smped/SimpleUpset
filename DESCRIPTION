@@ -19,7 +19,7 @@ LazyData: true
 Depends:
   ggplot2 (>= 4.0.0),
   patchwork (>= 1.3.2),
-  R (>= 4.5.0),
+  R (>= 4.1.0),
 Imports:
   dplyr,
   methods,
