@@ -114,6 +114,7 @@
 #' @import ggplot2
 #' @importFrom rlang enquo
 #' @importFrom dplyr desc
+#' @importFrom S7 prop
 #' @export
 simpleUpSet <- function(
     x,
@@ -163,7 +164,7 @@ simpleUpSet <- function(
   if (is_ggplot(top_left)) p_null <- top_left
 
   ## Additional annotation figures
-  keep_intersect <- droplevels(p_int@data$intersect)
+  keep_intersect <- droplevels(prop(p_int, "data")$intersect)
   intersect_tbl <- dplyr::filter(intersect_tbl, intersect %in% keep_intersect)
   p_upper <- .add_upper_plots(intersect_tbl, annotations, vjust)
   if (length(p_upper)) {
@@ -223,6 +224,7 @@ simpleUpSet <- function(
 #' @importFrom tidyr pivot_longer complete
 #' @importFrom tidyselect any_of
 #' @importFrom methods is
+#' @importFrom S7 prop
 #' @import ggplot2
 #' @keywords internal
 #' .plot_grid(p_int, p_sets, grid_points, grid_layers, stripe_colours)
@@ -242,9 +244,9 @@ simpleUpSet <- function(
     stopifnot(any(is_points))
   }
 
-  sets <-levels(p_sets@data$set)
+  sets <-levels(prop(p_sets, "data")$set)
   ## The grid tbl will contain all intersections
-  df <- droplevels(p_int@data)
+  df <- droplevels(prop(p_int, "data"))
   groups <- intersect(c(sets, "intersect", "highlight", "degree"), colnames(df))
   grid_tbl <- distinct(df, !!!syms(groups))
   grid_tbl <- pivot_longer(
