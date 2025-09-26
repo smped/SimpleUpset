@@ -1,3 +1,7 @@
+# SimpleUpset 0.1.0
+
+* Initial CRAN submission
+
 # SimpleUpset 0.0.6
 
 * Included the ability to add proportions instead of totals as bar labels
