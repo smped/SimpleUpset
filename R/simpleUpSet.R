@@ -72,7 +72,7 @@
 #' @return Object of class 'patchwork' containing multiple ggplot panels
 #'
 #' @examples
-#' ## Use the movies data from the package UpSetR
+#' ## Use a modified version of the movies data provided with the package UpSetR
 #' library(tidyverse)
 #' theme_set(theme_bw())
 #' sets <- c("Action", "Comedy", "Drama", "Thriller", "Romance")
