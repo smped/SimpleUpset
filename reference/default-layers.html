@@ -206,9 +206,8 @@ standard list manipulation.</p><div class="section">
 <p>Internally, the supplied data.frame has the additional columns 'intersect',
 'degree' added, along with the optional 'highlight' column.
 This object is used to directly create bars using <code>geom_bar()</code> and as such,
-any of the additional columns can be passed to <code>geom_bar()</code> as sorting options.
-These additional columns, along with any existing columns in the original
-data can be used as mapping aesthetics where relevant.</p>
+any of the additional columns can be passed to <code>geom_bar()</code> as mapping
+aesthetics, along with all original columns.</p>
 <p>For both the sets and intersection totals (i.e. labels), separate tables are
 created specifically for printing totals at the top (or left) of each bar,
 and these tables are specifically passed to those layers.
@@ -224,7 +223,7 @@ using <code><a href="https://scales.r-lib.org/reference/percent_format.html" cla
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># View the un-evaluated list of default layers for the sets</span></span></span>
 <span class="r-in"><span><span class="fu">default_set_layers</span><span class="op">(</span>dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> list(aes(y = set), geom_bar(bar_aes), geom_text(aes(x = size, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> list(aes(y = set), geom_bar(aes(fill = ~NULL)), geom_text(aes(x = size, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     label = f(size)), hjust = hjust, size = label_size), scale_x_reverse(expand = expansion(expand), </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     name = name, labels = comma), scale_y_discrete(position = "right", </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     name = NULL, labels = NULL), theme(axis.text.y.right = element_text(hjust = 0.5), </span>

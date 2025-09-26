@@ -189,7 +189,7 @@ scales, themes etc are easily visible by passing the argument,
 begin customisation from a low level.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/default-layers.html">default_set_layers</a></span><span class="op">(</span>dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; list(aes(y = set), geom_bar(bar_aes), geom_text(aes(x = size, </span></span>
+<span><span class="co">#&gt; list(aes(y = set), geom_bar(aes(fill = ~NULL)), geom_text(aes(x = size, </span></span>
 <span><span class="co">#&gt;     label = f(size)), hjust = hjust, size = label_size), scale_x_reverse(expand = expansion(expand), </span></span>
 <span><span class="co">#&gt;     name = name, labels = comma), scale_y_discrete(position = "right", </span></span>
 <span><span class="co">#&gt;     name = NULL, labels = NULL), theme(axis.text.y.right = element_text(hjust = 0.5), </span></span>
@@ -212,7 +212,7 @@ handled simply by the ellipsis (<code>...</code>)</p>
 <span>  <span class="op">)</span>,</span>
 <span>  set_layers <span class="op">=</span> <span class="fu"><a href="../reference/default-layers.html">default_set_layers</a></span><span class="op">(</span></span>
 <span>    fill <span class="op">=</span> <span class="st">"Decade"</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Paired"</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_none.html" class="external-link">guide_none</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, expand <span class="op">=</span> <span class="fl">0.3</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_none.html" class="external-link">guide_none</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.3</span>, <span class="fl">0</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="introduction_files/figure-html/upset-decade-1.png" width="960"></p>
@@ -253,13 +253,29 @@ intersection order.</p>
 <span>  <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Using Highlights"</span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span>, plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>hjust <span class="op">=</span> <span class="fl">2</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="introduction_files/figure-html/upset-highlights-1.png" width="960"></p>
+<p>Alternatively, the complete set of intersections containing any one
+of the sets can be highlighted simply by filling bars using that
+individual set.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/simpleUpSet.html">simpleUpSet</a></span><span class="op">(</span></span>
+<span>  <span class="va">movies</span>, <span class="va">sets</span>, min_size <span class="op">=</span> <span class="fl">20</span>, </span>
+<span>  intersect_layers <span class="op">=</span> <span class="fu"><a href="../reference/default-layers.html">default_intersect_layers</a></span><span class="op">(</span></span>
+<span>    fill <span class="op">=</span><span class="st">"Comedy"</span>, </span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grey23"</span>, <span class="st">"blue"</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_none.html" class="external-link">guide_none</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  grid_layers <span class="op">=</span> <span class="fu"><a href="../reference/default-layers.html">default_grid_layers</a></span><span class="op">(</span></span>
+<span>    colour <span class="op">=</span> <span class="st">"Comedy"</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_colour_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grey23"</span>, <span class="st">"blue"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="introduction_files/figure-html/upset-highlights2-1.png" width="960"></p>
 </div>
 <div class="section level2">
 <h2 id="adding-plots-to-upper-panels">Adding Plots to Upper Panels<a class="anchor" aria-label="anchor" href="#adding-plots-to-upper-panels"></a>
 </h2>
 <p>Additional panels can be included using the <code>annotations</code>
 argument</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Add a simple boxplot</span></span>
 <span><span class="fu"><a href="../reference/simpleUpSet.html">simpleUpSet</a></span><span class="op">(</span></span>
 <span>  <span class="va">movies</span>, <span class="va">sets</span>, n_intersect <span class="op">=</span> <span class="fl">10</span>,</span>
@@ -271,7 +287,7 @@ argument</p>
 <p>There is no particular limit to the complexity of the upper panels,
 beyond what is contained within the dataset, or what can be considered
 as useful for communication with readers</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/simpleUpSet.html">simpleUpSet</a></span><span class="op">(</span></span>
 <span>  <span class="va">movies</span>, <span class="va">sets</span>, n_intersect <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  set_layers <span class="op">=</span> <span class="fu"><a href="../reference/default-layers.html">default_set_layers</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span>,</span>
