@@ -24,6 +24,7 @@ Imports:
   dplyr,
   methods,
   rlang (>= 1.1.6),
+  S7,
   scales,
   tidyr,
   tidyselect
