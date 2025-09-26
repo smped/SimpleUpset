@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimpleUpset</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.5</span>
       </span>
     </div>
 
@@ -67,7 +67,7 @@
 <span>  <span class="va">x</span>,</span>
 <span>  sets <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sort_sets <span class="op">=</span> <span class="va">size</span>,</span>
-<span>  sort_intersect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">desc</span><span class="op">(</span><span class="va">size</span><span class="op">)</span>, <span class="va">degree</span><span class="op">)</span>,</span>
+<span>  sort_intersect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">desc</span><span class="op">(</span><span class="va">size</span><span class="op">)</span>, <span class="va">degree</span>, <span class="va">set</span><span class="op">)</span>,</span>
 <span>  n_intersect <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  min_size <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  min_degree <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -76,6 +76,7 @@
 <span>  intersect_layers <span class="op">=</span> <span class="fu"><a href="default-layers.html">default_intersect_layers</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  grid_layers <span class="op">=</span> <span class="fu"><a href="default-layers.html">default_grid_layers</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  highlight <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  highlight_levels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  annotations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">0.75</span>,</span>
 <span>  height <span class="op">=</span> <span class="fl">0.75</span>,</span>
@@ -102,16 +103,18 @@
 
 <dt id="arg-sort-sets">sort_sets<a class="anchor" aria-label="anchor" href="#arg-sort-sets"></a></dt>
 <dd><p>&lt;<code><a href="https://rlang.r-lib.org/reference/args_data_masking.html" class="external-link">data-masking</a></code>&gt; specification
-for set order, using variables such as size, desc(size) or NULL. Passed internally
-to <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">dplyr::arrange()</a></code>.
-The only possible column to call is 'size'</p></dd>
+for set order, using variables such as size, desc(size) or NULL. Passed
+internally to <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">dplyr::arrange()</a></code>. The only possible options are <code>size</code>,
+<code>desc(size)</code> or NULL (for sets in the order passed)</p></dd>
 
 
 <dt id="arg-sort-intersect">sort_intersect<a class="anchor" aria-label="anchor" href="#arg-sort-intersect"></a></dt>
 <dd><p>list of &lt;<code><a href="https://rlang.r-lib.org/reference/args_data_masking.html" class="external-link">data-masking</a></code>&gt;
 specifications for intersection order. Passed internally to
-<code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">dplyr::arrange()</a></code>. The available columns are 'size', degree' and 'set' Any
-other column names will cause an error.</p></dd>
+<code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">dplyr::arrange()</a></code>. The available columns are <code>size</code>, <code>degree</code> and <code>set</code>,
+along with <code>highlight</code> if specified. Any other column names will cause an
+error. The default order is in descending sizes, using degree and set to
+break ties.</p></dd>
 
 
 <dt id="arg-n-intersect">n_intersect<a class="anchor" aria-label="anchor" href="#arg-n-intersect"></a></dt>
@@ -147,6 +150,11 @@ using <code><a href="default-layers.html">default_intersect_layers()</a></code><
 highlight using <code>geom_intersect</code> and <code>scale_fill/colour_intersect</code>.
 Will add a column named <code>highlight</code> which can be called from any geom passed
 to the intersections barplot or matrix</p></dd>
+
+
+<dt id="arg-highlight-levels">highlight_levels<a class="anchor" aria-label="anchor" href="#arg-highlight-levels"></a></dt>
+<dd><p>Given the highlight column will be coerced to a factor
+when setting colours etc, levels can be manually set here for finer control.</p></dd>
 
 
 <dt id="arg-annotations">annotations<a class="anchor" aria-label="anchor" href="#arg-annotations"></a></dt>

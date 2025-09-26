@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SimpleUpset</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.5</span>
       </span>
     </div>
 
@@ -222,7 +222,9 @@ handled simply by the ellipsis (<code>...</code>)</p>
 </h2>
 <p>Sets and intersections can be simply highlighted using the set name
 for sets, or by using a <code><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when()</a></code> statement to define
-highlights</p>
+highlights. If the highlight column is added to the underlying data
+object, this column can additionally be used for determining
+intersection order.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Define the sets to be coloured by name, the use scale_fill_manual</span></span>
 <span><span class="va">set_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -245,6 +247,7 @@ highlights</p>
 <span>  set_layers <span class="op">=</span> <span class="va">set_list</span>,</span>
 <span>  intersect_layers <span class="op">=</span> <span class="va">intersect_list</span>,</span>
 <span>  grid_layers <span class="op">=</span> <span class="va">grid_list</span>,</span>
+<span>  sort_intersect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">highlight</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">size</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  highlight <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">Action</span> <span class="op">&amp;</span> <span class="va">Drama</span> <span class="op">~</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Using Highlights"</span><span class="op">)</span> <span class="op">&amp;</span></span>
@@ -301,7 +304,7 @@ as useful for communication with readers</p>
 <em>graphics</em>, <em>grDevices</em>, <em>utils</em>,
 <em>datasets</em>, <em>methods</em> and <em>base</em></p>
 <p><strong>other attached packages:</strong> <em>pander(v.0.6.6)</em>,
-<em>SimpleUpset(v.0.0.4)</em>, <em>patchwork(v.1.3.2)</em>,
+<em>SimpleUpset(v.0.0.5)</em>, <em>patchwork(v.1.3.2)</em>,
 <em>lubridate(v.1.9.4)</em>, <em>forcats(v.1.0.0)</em>,
 <em>stringr(v.1.5.2)</em>, <em>dplyr(v.1.1.4)</em>,
 <em>purrr(v.1.1.0)</em>, <em>readr(v.2.1.5)</em>,
