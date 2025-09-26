@@ -9,8 +9,9 @@
 default_set_layers(
   ...,
   fill = NULL,
+  labels = "size",
   f = comma,
-  expand = 0.2,
+  expand = c(0.2, 0),
   hjust = 1.1,
   label_size = 3.5,
   name = "Set Size",
@@ -20,8 +21,9 @@ default_set_layers(
 default_intersect_layers(
   ...,
   fill = NULL,
+  labels = "size",
   f = comma,
-  expand = 0.05,
+  expand = c(0, 0.05),
   vjust = -0.5,
   label_size = 3.5,
   name = "Intersection Size",
@@ -47,9 +49,12 @@ Will be added after the default layers}
 \item{fill}{Column to fill set bars by. Can be 'set' or another column within
 the main data object}
 
-\item{f}{Function for labelling set sizes and the set x-axis}
+\item{labels}{Choose either size or prop to label bars with totals or the
+proportion of all intersections}
 
-\item{expand}{axis expansion}
+\item{f}{Function for labelling set or intersection sizes sizes}
+
+\item{expand}{Multiplicative axis expansion passed to \code{\link[ggplot2:expansion]{ggplot2::expansion()}}}
 
 \item{hjust, vjust}{Passed to respective elements for simple adjustment of
 either set or intersection sizes}
@@ -140,6 +145,24 @@ standard list manipulation.
    \code{theme(margins = margin(5.5, 5.5, 5.5, 0), axis.text.y = element_text(hjust = 0.5), axis.ticks = element_blank())} \tab Ensures margins, text and tick marks are suitable for the UpSet layout \cr
 }
 
+}
+
+\subsection{Panel Internals}{
+
+Internally, the supplied data.frame has the additional columns 'intersect',
+'degree' added, along with the optional 'highlight' column.
+This object is used to directly create bars using \code{geom_bar()} and as such,
+any of the additional columns can be passed to \code{geom_bar()} as sorting options.
+These additional columns, along with any existing columns in the original
+data can be used as mapping aesthetics where relevant.
+
+For both the sets and intersection totals (i.e. labels), separate tables are
+created specifically for printing totals at the top (or left) of each bar,
+and these tables are specifically passed to those layers.
+Totals are included as 'size' and the proportion of all intersections is
+also included as the column 'prop' for both the sets and intersections panel.
+Whilst default labels are added using 'size', changing this to 'prop' and
+using \code{\link[scales:percent_format]{scales::percent()}} will work and is supported.
 }
 }
 \examples{
