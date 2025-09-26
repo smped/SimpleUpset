@@ -1,3 +1,7 @@
+# SimpleUpset 0.0.5
+
+* Added highlight_levels for finer control of highlighting
+
 # SimpleUpset 0.0.4
 
 * Changed set & intersect sorting to use data masking instead

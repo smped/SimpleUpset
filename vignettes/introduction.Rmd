@@ -107,7 +107,9 @@ simpleUpSet(
 ## Highlighting Intersections and Sets
 
 Sets and intersections can be simply highlighted using the set name for sets, 
-or by using a `case_when()` statement to define highlights
+or by using a `case_when()` statement to define highlights.
+If the highlight column is added to the underlying data object, this column can
+additionally be used for determining intersection order.
 
 ```{r upset-highlights}
 ## Define the sets to be coloured by name, the use scale_fill_manual
@@ -131,6 +133,7 @@ simpleUpSet(
   set_layers = set_list,
   intersect_layers = intersect_list,
   grid_layers = grid_list,
+  sort_intersect = list(highlight, desc(size)),
   highlight = case_when(Action & Drama ~ TRUE)
 ) &
   plot_annotation(title = "Using Highlights") &

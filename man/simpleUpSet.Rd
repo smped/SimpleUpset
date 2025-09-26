@@ -8,7 +8,7 @@ simpleUpSet(
   x,
   sets = NULL,
   sort_sets = size,
-  sort_intersect = list(desc(size), degree),
+  sort_intersect = list(desc(size), degree, set),
   n_intersect = 20,
   min_size = 0,
   min_degree = 1,
@@ -17,6 +17,7 @@ simpleUpSet(
   intersect_layers = default_intersect_layers(),
   grid_layers = default_grid_layers(),
   highlight = NULL,
+  highlight_levels = NULL,
   annotations = list(),
   width = 0.75,
   height = 0.75,
@@ -34,14 +35,16 @@ simpleUpSet(
 \item{sets}{Character vector listing columns of x to plot}
 
 \item{sort_sets}{<\code{\link[rlang:args_data_masking]{data-masking}}> specification
-for set order, using variables such as size, desc(size) or NULL. Passed internally
-to \code{\link[dplyr:arrange]{dplyr::arrange()}}.
-The only possible column to call is 'size'}
+for set order, using variables such as size, desc(size) or NULL. Passed
+internally to \code{\link[dplyr:arrange]{dplyr::arrange()}}. The only possible options are \code{size},
+\code{desc(size)} or NULL (for sets in the order passed)}
 
 \item{sort_intersect}{list of <\code{\link[rlang:args_data_masking]{data-masking}}>
 specifications for intersection order. Passed internally to
-\code{\link[dplyr:arrange]{dplyr::arrange()}}. The available columns are 'size', degree' and 'set' Any
-other column names will cause an error.}
+\code{\link[dplyr:arrange]{dplyr::arrange()}}. The available columns are \code{size}, \code{degree} and \code{set},
+along with \code{highlight} if specified. Any other column names will cause an
+error. The default order is in descending sizes, using degree and set to
+break ties.}
 
 \item{n_intersect}{Maximum number of intersections to show}
 
@@ -63,6 +66,9 @@ using \code{\link[=default_intersect_layers]{default_intersect_layers()}}}
 highlight using \code{geom_intersect} and \code{scale_fill/colour_intersect}.
 Will add a column named \code{highlight} which can be called from any geom passed
 to the intersections barplot or matrix}
+
+\item{highlight_levels}{Given the highlight column will be coerced to a factor
+when setting colours etc, levels can be manually set here for finer control.}
 
 \item{annotations}{list where each element is a list of ggplot2 layers.
 Each element will be added as an upper annotation panel above the

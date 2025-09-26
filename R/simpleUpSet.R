@@ -30,13 +30,15 @@
 #' @param x Input data frame
 #' @param sets Character vector listing columns of x to plot
 #' @param sort_sets <[`data-masking`][rlang::args_data_masking]> specification
-#' for set order, using variables such as size, desc(size) or NULL. Passed internally
-#' to [dplyr::arrange()].
-#' The only possible column to call is 'size'
+#' for set order, using variables such as size, desc(size) or NULL. Passed
+#' internally to [dplyr::arrange()]. The only possible options are `size`,
+#' `desc(size)` or NULL (for sets in the order passed)
 #' @param sort_intersect list of <[`data-masking`][rlang::args_data_masking]>
 #' specifications for intersection order. Passed internally to
-#' [dplyr::arrange()]. The available columns are 'size', degree' and 'set' Any
-#' other column names will cause an error.
+#' [dplyr::arrange()]. The available columns are `size`, `degree` and `set`,
+#' along with `highlight` if specified. Any other column names will cause an
+#' error. The default order is in descending sizes, using degree and set to
+#' break ties.
 #' @param n_intersect Maximum number of intersections to show
 #' @param min_size Only show intersections larger than this value
 #' @param min_degree,max_degree Only show intersections within this range
@@ -55,6 +57,8 @@
 #' highlight using `geom_intersect` and `scale_fill/colour_intersect`.
 #' Will add a column named `highlight` which can be called from any geom passed
 #' to the intersections barplot or matrix
+#' @param highlight_levels Given the highlight column will be coerced to a factor
+#' when setting colours etc, levels can be manually set here for finer control.
 #' @param width,height Proportional width and height of the intersection panel
 #' @param stripe_colours Colours for background stripes in the lower two panels.
 #' For no stripes, set as NULL
@@ -115,13 +119,13 @@ simpleUpSet <- function(
     x,
     sets = NULL,
     sort_sets = size,
-    sort_intersect = list(desc(size), degree),
+    sort_intersect = list(desc(size), degree, set),
     n_intersect = 20, min_size = 0,
     min_degree = 1, max_degree = length(sets),
     set_layers = default_set_layers(),
     intersect_layers = default_intersect_layers(),
     grid_layers = default_grid_layers(),
-    highlight = NULL,
+    highlight = NULL, highlight_levels = NULL,
     annotations = list(),
     width = 0.75, height = 0.75, vjust_ylab = 0.8,
     stripe_colours = c("grey90", "white"),
@@ -137,7 +141,8 @@ simpleUpSet <- function(
 
   ## Get intersections table
   intersect_tbl <- .add_intersections(
-    x, sets, substitute(sort_intersect), na.rm, enquo(highlight)
+    x, sets, substitute(sort_intersect), na.rm, enquo(highlight),
+    highlight_levels
   )
 
   ## Sets panel
@@ -437,7 +442,7 @@ simpleUpSet <- function(
 #' @importFrom tidyr pivot_wider
 #' @importFrom rlang quo_is_null !! !!!
 #' @importFrom tidyselect all_of
-.add_intersections <- function(x, sets, sort_expr, na.rm, hl){
+.add_intersections <- function(x, sets, sort_expr, na.rm, hl, hl_levels){
 
   ## Coerce all set columns to be logical & remove rows where all are FALSE
   x[sets] <- lapply(x[sets], as.logical)
@@ -448,10 +453,14 @@ simpleUpSet <- function(
     if (!grepl("^case_when", as_label(hl)))
       stop("highlight can only be specified as a `case_when() statement")
     x <- mutate(x, highlight = !!hl)
+    if (is.null(hl_levels)) hl_levels <- sort(unique(x$highlight))
+    x$highlight <- factor(x$highlight, levels = hl_levels) |> droplevels()
   }
 
   ## Determine the intersect number to a column in the original
-  set_tbl <- summarise(x, size = dplyr::n(), .by = c(all_of(sets)))
+  set_tbl <- summarise(
+    x, size = dplyr::n(), .by = any_of(c(sets, "highlight"))
+  )
   set_tbl$degree <- rowSums(set_tbl[sets])
   set_tbl$temp <- seq_len(nrow(set_tbl))
 
@@ -473,7 +482,7 @@ simpleUpSet <- function(
 
   ## Add the intersection id & remove the temp columns
   set_tbl$intersect <- as.factor(seq_len(nrow(set_tbl)))
-  set_tbl$size <- set_tbl$temp <- NULL
+  set_tbl <- dplyr::select(set_tbl, all_of(c(sets, "intersect", "degree")))
 
   ## Return the original table with intersect numbers & logical columns
   left_join(x, set_tbl, by = sets)
