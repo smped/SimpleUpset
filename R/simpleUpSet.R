@@ -452,7 +452,7 @@ simpleUpSet <- function(
       stop("highlight can only be specified as a `case_when() statement")
     x <- mutate(x, highlight = !!hl)
     if (is.null(hl_levels)) hl_levels <- sort(unique(x$highlight))
-    x$highlight <- factor(x$highlight, levels = hl_levels) |> droplevels()
+    x$highlight <- droplevels(factor(x$highlight, levels = hl_levels))
   }
 
   ## Determine the intersect number to a column in the original
