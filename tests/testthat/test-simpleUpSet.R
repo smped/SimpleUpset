@@ -6,31 +6,31 @@ test_that("Basic plotting works", {
   ## Simple failures
   expect_error(simpleUpSet(movies, sets, width = 10))
   ## Expected data objects
-  expect_true(is_waiver(p[[1]]@data))
-  expect_true("intersect" %in% colnames(p[[2]]@data))
-  expect_true("set" %in% colnames(p[[3]]@data))
-  expect_true(all(c("set","intersect") %in% colnames(p[[4]]@data)))
+  expect_true(is_waiver(prop(p[[1]], 'data')))
+  expect_true("intersect" %in% colnames(prop(p[[2]], 'data')))
+  expect_true("set" %in% colnames(prop(p[[3]], 'data')))
+  expect_true(all(c("set","intersect") %in% colnames(prop(p[[4]], 'data'))))
   ## Expected layers
-  expect_equal(names(p[[2]]@layers), c("geom_bar", "geom_text"))
+  expect_equal(names(prop(p[[2]], 'layers')), c("geom_bar", "geom_text"))
   expect_equal(
-    names(p[[3]]@layers), c("geom_rect", "geom_bar", "geom_text")
+    names(prop(p[[3]], 'layers')), c("geom_rect", "geom_bar", "geom_text")
   )
   expect_equal(
-    unname(vapply(p[[4]]@layers, \(x) is(x$geom), character(1))),
+    unname(vapply(prop(p[[4]], 'layers'), \(x) is(x$geom), character(1))),
     c("GeomRect", "GeomPoint", "GeomPoint", "GeomSegment")
   )
   ## Expected scales
   expect_equal(
-    vapply(p[[2]]@scales$scales, is, character(1)),
+    vapply(prop(p[[2]], 'scales')$scales, is, character(1)),
     c("ScaleDiscretePosition", "ScaleContinuousPosition")
   )
-  expect_equal(p[[3]]@scales$scales[[1]]$trans$name, "reverse")
+  expect_equal(prop(p[[3]], 'scales')$scales[[1]]$trans$name, "reverse")
   expect_equal(
-    vapply(p[[3]]@scales$scales, is, character(1)),
+    vapply(prop(p[[3]], 'scales')$scales, is, character(1)),
     c("ScaleDiscretePosition", "ScaleContinuousPosition")[c(2, 1)]
   )
   expect_equal(
-    vapply(p[[4]]@scales$scales, is, character(1)),
+    vapply(prop(p[[4]], 'scales')$scales, is, character(1)),
     rep("ScaleDiscretePosition", 2)
   )
 
@@ -43,9 +43,9 @@ test_that("Adding upper panels works as expected", {
   )
   expect_true(is(p, "patchwork"))
   expect_true(is(p[[2]], "patchwork"))
-  expect_true(is(p[[2]][[1]]@layers[[1]]$geom, "GeomBoxplot"))
-  expect_equal(as_label(p[[2]][[1]]@layers[[1]]$mapping$y), "AvgRating")
-  expect_equal(p[[2]][[1]]@theme$margins, margin(0, 5.5, 5.5, 0))
+  expect_true(is(prop(p[[2]][[1]], 'layers')[[1]]$geom, "GeomBoxplot"))
+  expect_equal(as_label(prop(p[[2]][[1]], 'layers')[[1]]$mapping$y), "AvgRating")
+  expect_equal(prop(p[[2]][[1]], 'theme')$margins, margin(0, 5.5, 5.5, 0))
 
   expect_error(simpleUpSet(movies, sets, annotations = "bob"))
 })
@@ -73,12 +73,12 @@ test_that("Upper Left works as expected", {
   )
   expect_true(is_ggplot(p[[1]]))
   expect_equal(
-    vapply(p[[1]]@mapping, as_label, character(1)), c(x = "speed", y = "dist")
+    vapply(prop(p[[1]], 'mapping'), as_label, character(1)), c(x = "speed", y = "dist")
   )
 
 })
 test_that("highlights work as expected", {
   p <- simpleUpSet(movies, sets, highlight = case_when(Action ~TRUE))
-  expect_true("highlight" %in% colnames(p[[2]]@data))
+  expect_true("highlight" %in% colnames(prop(p[[2]], 'data')))
   expect_error(simpleUpSet(movies, sets, highlight = TRUE), "highlight can only.+")
 })
