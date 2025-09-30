@@ -1,7 +1,7 @@
 Package: SimpleUpset
 Type: Package
 Title: Create Upset Plots
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: c(
     person(
       "Stevie", "Pederson",
@@ -10,7 +10,7 @@ Authors@R: c(
       comment = c(ORCID = "0000-0001-8197-3303")
     )
   )
-Description: Create UpSet plots using a combination of ggplot2 and patchwork.
+Description: Create Upset plots using a combination of 'ggplot2' and 'patchwork'.
 URL: https://github.com/smped/SimpleUpset
 BugReports: https://github.com/smped/SimpleUpset/issues
 License: GPL-3
