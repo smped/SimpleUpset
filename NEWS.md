@@ -1,3 +1,7 @@
+# SimpleUpset 0.1.3
+
+* Added 'ascending', 'descending' or 'none' as options for sorting sets
+
 # SimpleUpset 0.1.0
 
 * Initial CRAN submission
