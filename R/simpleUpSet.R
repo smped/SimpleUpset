@@ -32,7 +32,8 @@
 #' @param sort_sets <[`data-masking`][rlang::args_data_masking]> specification
 #' for set order, using variables such as size, desc(size) or NULL. Passed
 #' internally to [dplyr::arrange()]. The only possible options are `size`,
-#' `desc(size)` or NULL (for sets in the order passed)
+#' `desc(size)` or NULL (for sets in the order passed). Can additionally accept
+#' the arguments "ascending", "descending" or "none"
 #' @param sort_intersect list of <[`data-masking`][rlang::args_data_masking]>
 #' specifications for intersection order. Passed internally to
 #' [dplyr::arrange()]. The available columns are `size`, `degree` and `set`,
@@ -351,15 +352,28 @@ simpleUpSet <- function(
 
 }
 
-#' @importFrom dplyr summarise across arrange
-#' @importFrom rlang !! quo_is_null
+#' @importFrom dplyr summarise across arrange desc
+#' @importFrom rlang !! quo_is_null quo_get_expr sym
 #' @importFrom tidyselect everything all_of
 #' @importFrom tidyr pivot_longer
 .get_set_levels <- function(tbl, sets, sort_sets, na.rm) {
 
   sum_tbl <- summarise(tbl, across(all_of(sets), \(x) sum(x, na.rm = na.rm)))
   sum_tbl <- pivot_longer(sum_tbl, everything(), names_to = "set", values_to = "size")
-  if (!quo_is_null(sort_sets)) sum_tbl <- arrange(sum_tbl, !!sort_sets)
+
+  sort_quo_expr <- quo_get_expr(sort_sets)
+  if (!quo_is_null(sort_sets)) {
+    if (is(sort_quo_expr, "name") | is(sort_quo_expr, "call")) {
+      ## Handle size/desc(size). Anything else will error
+      sum_tbl <- arrange(sum_tbl, !!sort_sets)
+    } else {
+      ## Now handle ascending/descending as character arguments
+      sort_quo_expr <- match.arg(sort_quo_expr, c("ascending", "descending", "none"))
+      if (sort_quo_expr == "ascending")  sum_tbl <- arrange(sum_tbl, !!sym("size"))
+      if (sort_quo_expr == "descending")  sum_tbl <- arrange(sum_tbl, desc(!!sym("size")))
+    }
+  }
+
   sum_tbl$set
 
 }

@@ -37,7 +37,8 @@ simpleUpSet(
 \item{sort_sets}{<\code{\link[rlang:args_data_masking]{data-masking}}> specification
 for set order, using variables such as size, desc(size) or NULL. Passed
 internally to \code{\link[dplyr:arrange]{dplyr::arrange()}}. The only possible options are \code{size},
-\code{desc(size)} or NULL (for sets in the order passed)}
+\code{desc(size)} or NULL (for sets in the order passed). Can additionally accept
+the arguments "ascending", "descending" or "none"}
 
 \item{sort_intersect}{list of <\code{\link[rlang:args_data_masking]{data-masking}}>
 specifications for intersection order. Passed internally to

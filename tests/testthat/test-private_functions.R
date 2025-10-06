@@ -1,3 +1,23 @@
+test_that("Set levels are set correctly", {
+
+  sort_sets <- substitute(size)
+  asc <- c("Romance", "Thriller", "Action", "Comedy", "Drama")
+  expect_equal(.get_set_levels(movies, sets, enquo(sort_sets), TRUE), asc)
+  sort_sets <- "ascending"
+  expect_equal(.get_set_levels(movies, sets, enquo(sort_sets), TRUE), asc)
+
+  sort_sets <- substitute(desc(size))
+  expect_equal(.get_set_levels(movies, sets, enquo(sort_sets), TRUE), rev(asc))
+  sort_sets <- "descending"
+  expect_equal(.get_set_levels(movies, sets, enquo(sort_sets), TRUE), rev(asc))
+
+  sort_sets <- substitute(NULL)
+  expect_equal(.get_set_levels(movies, sets, enquo(sort_sets), TRUE), sets)
+  sort_sets <- "none"
+  expect_equal(.get_set_levels(movies, sets, enquo(sort_sets), TRUE), sets)
+
+})
+
 
 test_that(".add_intersections adds & transforms columns", {
   hl <- NULL
@@ -11,7 +31,7 @@ test_that(".add_intersections adds & transforms columns", {
 
 })
 
-test_that("Sorting works as expected", {
+test_that("Intersection sorting works as expected", {
   hl <- NULL
 
   sort_intersect <- substitute(list(desc(size)))
