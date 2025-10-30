@@ -1,4 +1,4 @@
-# SimpleUpSet 
+# SimpleUpSet <img id="simpleupset_logo" alt="SimpleUpset Logo" src="man/figures/SimpleUpset.png" align="right" width = "125" />
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/smped/SimpleUpset/workflows/R-CMD-check-CRAN/badge.svg)](https://github.com/smped/SimpleUpset/actions)
