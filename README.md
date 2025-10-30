@@ -14,4 +14,4 @@ using a combination of `ggplot` and `patchwork` to put the figures together.
 In addition to the simple UpSet plots, additional panels can be added above 
 the intersections to allow more informative plotting.
 
-This package is currently in active development and should be considered unstable
+Logo design by [Jimmy Breen](https://github.com/jimmybgammyknee)
