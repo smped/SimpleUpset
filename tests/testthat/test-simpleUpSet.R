@@ -88,7 +88,9 @@ test_that("Empty points are shown for sets without an intersection", {
   b <- sample(letters, 20)
   c <- "dog"
   vals <- unique(c(a, b, c))
-  df <- list(a = a, b = b, c = c) |> lapply(\(x) vals %in% x) |> as_tibble()
+  df <- as.data.frame(
+    lapply(list(a = a, b = b, c = c) , \(x) vals %in% x)
+  )
   p <- simpleUpSet(df, min_size = 2)
   expect_true("c" %in% p[[4]]@layers[[3]]$data$set)
 
