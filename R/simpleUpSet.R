@@ -256,7 +256,6 @@ simpleUpSet <- function(
   grid_tbl <- grid_tbl[grid_tbl[["in_group"]],]
   grid_tbl$set <- factor(grid_tbl$set, levels = sets)
   grid_tbl$set_int <- as.integer(grid_tbl$set)
-  grid_tbl <- droplevels(grid_tbl)
   grid_tbl <- left_join(
     grid_tbl,  distinct(df, !!!syms(c(sets, "intersect", "degree"))),
     by = join_by(intersect, degree)
