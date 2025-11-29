@@ -167,7 +167,7 @@ logical values, or logical values directly.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Action"</span>, <span class="st">"Comedy"</span>, <span class="st">"Drama"</span>, <span class="st">"Thriller"</span>, <span class="st">"Romance"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/simpleUpSet.html">simpleUpSet</a></span><span class="op">(</span><span class="va">movies</span>, <span class="va">sets</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/simple-upset-1.png" width="960"></p>
+<p><img src="introduction_files/figure-html/simple-upset-1.png" class="r-plt" width="960"></p>
 <p>The number of intersections can be controlled using the arguments
 <code>n_intersect</code> to define a maximum number plotted, or
 <code>min_size</code> to only show those greater than any given
@@ -215,7 +215,7 @@ handled simply by the ellipsis (<code>...</code>).</p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_none.html" class="external-link">guide_none</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.3</span>, <span class="fl">0</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/upset-decade-1.png" width="960"></p>
+<p><img src="introduction_files/figure-html/upset-decade-1.png" class="r-plt" width="960"></p>
 </div>
 <div class="section level2">
 <h2 id="highlighting-intersections-and-sets">Highlighting Intersections and Sets<a class="anchor" aria-label="anchor" href="#highlighting-intersections-and-sets"></a>
@@ -252,7 +252,7 @@ intersection order.</p>
 <span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Using Highlights"</span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span>, plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>hjust <span class="op">=</span> <span class="fl">2</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/upset-highlights-1.png" width="960"></p>
+<p><img src="introduction_files/figure-html/upset-highlights-1.png" class="r-plt" width="960"></p>
 <p>Alternatively, the complete set of intersections containing any one
 of the sets can be highlighted simply by filling bars using that
 individual set.</p>
@@ -268,7 +268,7 @@ individual set.</p>
 <span>    colour <span class="op">=</span> <span class="st">"Comedy"</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_colour_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grey23"</span>, <span class="st">"blue"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/upset-highlights2-1.png" width="960"></p>
+<p><img src="introduction_files/figure-html/upset-highlights2-1.png" class="r-plt" width="960"></p>
 </div>
 <div class="section level2">
 <h2 id="adding-plots-to-upper-panels">Adding Plots to Upper Panels<a class="anchor" aria-label="anchor" href="#adding-plots-to-upper-panels"></a>
@@ -283,7 +283,7 @@ argument.</p>
 <span>  intersect_layers <span class="op">=</span> <span class="fu"><a href="../reference/default-layers.html">default_intersect_layers</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  annotations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_boxplot.html" class="external-link">geom_boxplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">AvgRating</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/upset-boxplot-1.png" width="960"></p>
+<p><img src="introduction_files/figure-html/upset-boxplot-1.png" class="r-plt" width="960"></p>
 <p>There is no particular limit to the complexity of the upper panels,
 beyond what is contained within the dataset, or what can be considered
 as useful for communication with readers.</p>
@@ -303,12 +303,12 @@ as useful for communication with readers.</p>
 <span>  <span class="op">)</span>, guides <span class="op">=</span> <span class="st">"collect"</span></span>
 <span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/upset-violin-1.png" width="960"></p>
+<p><img src="introduction_files/figure-html/upset-violin-1.png" class="r-plt" width="960"></p>
 </div>
 <div class="section level2">
 <h2 id="sessioninfo">SessionInfo<a class="anchor" aria-label="anchor" href="#sessioninfo"></a>
 </h2>
-<p><strong>R version 4.5.1 (2025-06-13)</strong></p>
+<p><strong>R version 4.5.2 (2025-10-31)</strong></p>
 <p><strong>Platform:</strong> x86_64-pc-linux-gnu</p>
 <p><strong>locale:</strong> <em>LC_CTYPE=C.UTF-8</em>,
 <em>LC_NUMERIC=C</em>, <em>LC_TIME=C.UTF-8</em>,
@@ -322,15 +322,15 @@ as useful for communication with readers.</p>
 <p><strong>other attached packages:</strong> <em>pander(v.0.6.6)</em>,
 <em>SimpleUpset(v.0.1.3)</em>, <em>patchwork(v.1.3.2)</em>,
 <em>lubridate(v.1.9.4)</em>, <em>forcats(v.1.0.1)</em>,
-<em>stringr(v.1.5.2)</em>, <em>dplyr(v.1.1.4)</em>,
-<em>purrr(v.1.1.0)</em>, <em>readr(v.2.1.5)</em>,
+<em>stringr(v.1.6.0)</em>, <em>dplyr(v.1.1.4)</em>,
+<em>purrr(v.1.2.0)</em>, <em>readr(v.2.1.6)</em>,
 <em>tidyr(v.1.3.1)</em>, <em>tibble(v.3.3.0)</em>,
-<em>ggplot2(v.4.0.0)</em> and <em>tidyverse(v.2.0.0)</em></p>
+<em>ggplot2(v.4.0.1)</em> and <em>tidyverse(v.2.0.0)</em></p>
 <p><strong>loaded via a namespace (and not attached):</strong>
 <em>sass(v.0.4.10)</em>, <em>generics(v.0.1.4)</em>,
 <em>stringi(v.1.8.7)</em>, <em>hms(v.1.1.4)</em>,
-<em>digest(v.0.6.37)</em>, <em>magrittr(v.2.0.4)</em>,
-<em>evaluate(v.1.0.5)</em>, <em>grid(v.4.5.1)</em>,
+<em>digest(v.0.6.39)</em>, <em>magrittr(v.2.0.4)</em>,
+<em>evaluate(v.1.0.5)</em>, <em>grid(v.4.5.2)</em>,
 <em>timechange(v.0.3.0)</em>, <em>RColorBrewer(v.1.1-3)</em>,
 <em>fastmap(v.1.2.0)</em>, <em>jsonlite(v.2.0.0)</em>,
 <em>scales(v.1.4.0)</em>, <em>textshaping(v.1.0.4)</em>,
@@ -338,19 +338,19 @@ as useful for communication with readers.</p>
 <em>crayon(v.1.5.3)</em>, <em>rlang(v.1.1.6)</em>,
 <em>bit64(v.4.6.0-1)</em>, <em>withr(v.3.0.2)</em>,
 <em>cachem(v.1.1.0)</em>, <em>yaml(v.2.3.10)</em>,
-<em>parallel(v.4.5.1)</em>, <em>tools(v.4.5.1)</em>,
+<em>parallel(v.4.5.2)</em>, <em>tools(v.4.5.2)</em>,
 <em>tzdb(v.0.5.0)</em>, <em>vctrs(v.0.6.5)</em>, <em>R6(v.2.6.1)</em>,
 <em>lifecycle(v.1.0.4)</em>, <em>bit(v.4.6.0)</em>,
 <em>fs(v.1.6.6)</em>, <em>vroom(v.1.6.6)</em>, <em>ragg(v.1.5.0)</em>,
 <em>pkgconfig(v.2.0.3)</em>, <em>desc(v.1.4.3)</em>,
-<em>pkgdown(v.2.1.3)</em>, <em>pillar(v.1.11.1)</em>,
+<em>pkgdown(v.2.2.0)</em>, <em>pillar(v.1.11.1)</em>,
 <em>bslib(v.0.9.0)</em>, <em>gtable(v.0.3.6)</em>,
 <em>glue(v.1.8.0)</em>, <em>Rcpp(v.1.1.0)</em>,
-<em>systemfonts(v.1.3.1)</em>, <em>xfun(v.0.53)</em>,
+<em>systemfonts(v.1.3.1)</em>, <em>xfun(v.0.54)</em>,
 <em>tidyselect(v.1.2.1)</em>, <em>knitr(v.1.50)</em>,
 <em>farver(v.2.1.2)</em>, <em>htmltools(v.0.5.8.1)</em>,
 <em>labeling(v.0.4.3)</em>, <em>rmarkdown(v.2.30)</em>,
-<em>compiler(v.4.5.1)</em> and <em>S7(v.0.2.0)</em></p>
+<em>compiler(v.4.5.2)</em> and <em>S7(v.0.2.1)</em></p>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
@@ -391,7 +391,7 @@ D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019.
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>
