@@ -92,7 +92,7 @@ test_that("Empty points are shown for sets without an intersection", {
     lapply(list(a = a, b = b, c = c) , \(x) vals %in% x)
   )
   p <- simpleUpSet(df, min_size = 2)
-  expect_true("c" %in% p[[4]]@layers[[3]]$data$set)
+  expect_true("c" %in% prop(p[[4]], "layers")[[3]]$data$set)
 
 
 })
