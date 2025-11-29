@@ -82,3 +82,15 @@ test_that("highlights work as expected", {
   expect_true("highlight" %in% colnames(prop(p[[2]], 'data')))
   expect_error(simpleUpSet(movies, sets, highlight = TRUE), "highlight can only.+")
 })
+
+test_that("Empty points are shown for sets without an intersection", {
+  a <- sample(letters, 20)
+  b <- sample(letters, 20)
+  c <- "dog"
+  vals <- unique(c(a, b, c))
+  df <- list(a = a, b = b, c = c) |> lapply(\(x) vals %in% x) |> as_tibble()
+  p <- simpleUpSet(df, min_size = 2)
+  expect_true("c" %in% p[[4]]@layers[[3]]$data$set)
+
+
+})
