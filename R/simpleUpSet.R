@@ -213,9 +213,9 @@ simpleUpSet <- function(
         axis.ticks.x.bottom = element_blank(),
         axis.text.x = element_blank(),
         axis.title.x = element_blank(),
-        axis.title.y = element_text(vjust = -vj),
         margins = margin(0, 5.5, 5.5, 0)
-      )
+      ) +
+          .theme_axis_title_y_vjust(-vj)
     }
   )
 }
@@ -342,7 +342,7 @@ simpleUpSet <- function(
 
   ## Add the vjust as a new theme
   n_layers <- length(layers)
-  layers[[n_layers + 1]] <- theme(axis.title.y = element_text(vjust = -vj))
+  layers[[n_layers + 1]] <- .theme_axis_title_y_vjust(-vj)
 
   ## The intial plot
   p <- ggplot(tbl)
@@ -524,6 +524,15 @@ simpleUpSet <- function(
     is_theme(x), is_scale(x), is_position(x), is_guides(x), is_layer(x),
     is_mapping(x), is_coord(x), is_stat(x), is_facet(x)
   )
+}
+
+#' @keywords internal
+#' @import ggplot2
+.theme_axis_title_y_vjust <- function(vj){
+    el <- theme_get()$axis.title.y
+    if (is.null(el)) el <- element_text()
+    el$vjust <- vj
+    theme(axis.title.y = el)
 }
 
 ## Key options to develop
