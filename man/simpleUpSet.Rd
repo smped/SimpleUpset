@@ -63,7 +63,7 @@ using \code{\link[=default_intersect_layers]{default_intersect_layers()}}}
 
 \item{grid_layers}{List of \code{ggplot2} layers, scales & themes}
 
-\item{highlight}{\code{\link[dplyr:case_when]{dplyr::case_when()}} statement defining all intersections to
+\item{highlight}{\code{\link[dplyr:case_when]{case_when()}} statement defining all intersections to
 highlight using \code{geom_intersect} and \code{scale_fill/colour_intersect}.
 Will add a column named \code{highlight} which can be called from any geom passed
 to the intersections barplot or matrix}
@@ -83,7 +83,7 @@ passed with the exception of facets.}
 \item{stripe_colours}{Colours for background stripes in the lower two panels.
 For no stripes, set as NULL}
 
-\item{guides}{Passed to \code{\link[patchwork:plot_layout]{patchwork::plot_layout()}}}
+\item{guides}{Passed to \code{\link[patchwork:plot_layout]{plot_layout()}}}
 
 \item{top_left}{Optional ggplot object to show in the top left panel. Will
 default to an empty ggplot object}

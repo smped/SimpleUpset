@@ -1,7 +1,7 @@
 Package: SimpleUpset
 Type: Package
 Title: Create Upset Plots
-Version: 0.1.4
+Version: 0.1.5
 Authors@R: c(
     person(
       "Stevie", "Pederson",
@@ -33,7 +33,7 @@ Suggests:
   pkgdown,
   testthat (>= 3.0.0),
   tidyverse (>= 2.0.0),
-RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+Config/roxygen2/version: 8.0.0

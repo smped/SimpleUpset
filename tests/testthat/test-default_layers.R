@@ -19,7 +19,11 @@ test_that("default_sets_layer behaves as expected", {
     c(x = "size", label = "f(size)")
   )
   expect_equal(
-    unlist(set_list[[3]]$aes_params), c(hjust = 1.1, size = 3.5)
+    unlist(set_list[[3]]$aes_params),
+    c(
+        hjust = 1.1, vjust = 0.5, angle = 0, size = 3.5, fontface = 1,
+        lineheight = 1.2
+    )
   )
   expect_equal(set_list[[4]]$labels(1000), "1,000")
   expect_equal(set_list[[4]]$expand, c(0.2, 0, 0, 0))
@@ -69,7 +73,11 @@ test_that("default_intersect_layers behaves as expected", {
     c(y = "size", label = "f(size)")
   )
   expect_equal(
-    unlist(intersect_list[[3]]$aes_params), c(vjust = -0.5, size = 3.5)
+    unlist(intersect_list[[3]]$aes_params),
+    c(
+        vjust = -0.5, hjust = 0.5, angle = 0, fontface = 1, lineheight = 1.2,
+        size = 3.5
+    )
   )
   expect_null(intersect_list[[4]]$labels)
   expect_null(intersect_list[[4]]$name)

@@ -100,7 +100,8 @@
 #' both non-empty intersections and segments (dark)
 #' @param shape,size Point shape/size passed to the intersections matrix
 #' @param label_size Passed to labels for sets and intersections
-#' @param hjust,vjust Passed to respective elements for simple adjustment of
+#' @param hjust,vjust,lineheight,angle,fontface Passed to respective elements
+#'  for simple adjustment of
 #' either set or intersection sizes
 #'
 #' @return List of ggplot2 elements
@@ -122,7 +123,8 @@
 #' @export
 #' @rdname default-layers
 default_set_layers <- function(
-    ..., fill = NULL, labels = "size", f = comma, expand = c(0.2, 0), hjust = 1.1,
+    ..., fill = NULL, labels = "size", f = comma, expand = c(0.2, 0),
+    hjust = 1.1, vjust = 0.5, angle = 0, lineheight = 1.2, fontface = 1,
     label_size = 3.5, name = "Set Size", dry_run = FALSE
 ){
 
@@ -143,7 +145,9 @@ default_set_layers <- function(
       aes(y = set),
       geom_bar(aes(fill = {{ fill }})),
       geom_text(
-        aes(x = size, label = f(!!sym(labels))), hjust = hjust, size = label_size
+        aes(x = size, label = f(!!sym(labels))),
+        hjust = hjust, vjust = vjust, angle = angle, size = label_size,
+        fontface = fontface, lineheight = lineheight
       ),
       scale_x_reverse(expand = expansion(expand), name = name, labels = comma),
       scale_y_discrete(position = "right", name = NULL, labels = NULL),
@@ -167,8 +171,8 @@ default_set_layers <- function(
 #' @rdname default-layers
 default_intersect_layers <- function(
     ..., fill = NULL, labels = "size", f = comma, expand = c(0, 0.05),
-    vjust = -0.5, label_size = 3.5, name = "Intersection Size",
-    dry_run = FALSE
+    hjust = 0.5, vjust = -0.5, angle = 0, fontface = 1, lineheight = 1.2,
+    label_size = 3.5, name = "Intersection Size", dry_run = FALSE
 ){
 
   ## Currently, no NULL handler is setup for labels...
@@ -188,7 +192,9 @@ default_intersect_layers <- function(
       aes(x = intersect),
       geom_bar(aes(fill = {{ fill }})),
       geom_text(
-        aes(y = size, label = f(!!sym(labels))), vjust = vjust, size = label_size
+        aes(y = size, label = f(!!sym(labels))),
+        vjust = vjust, hjust = hjust, angle = angle, fontface = fontface,
+        lineheight = lineheight, size = label_size
       ),
       scale_x_discrete(name = NULL, labels = NULL),
       scale_y_continuous(name = name, expand = expansion(expand), labels = comma),
