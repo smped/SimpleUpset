@@ -23,6 +23,7 @@ simpleUpSet(
   height = 0.75,
   vjust_ylab = 0.8,
   stripe_colours = c("grey90", "white"),
+  keep_empty = FALSE,
   guides = "keep",
   top_left = NULL,
   ...,
@@ -82,6 +83,8 @@ passed with the exception of facets.}
 
 \item{stripe_colours}{Colours for background stripes in the lower two panels.
 For no stripes, set as NULL}
+
+\item{keep_empty}{Keep empty sets in the figure}
 
 \item{guides}{Passed to \code{\link[patchwork:plot_layout]{plot_layout()}}}
 

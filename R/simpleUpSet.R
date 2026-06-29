@@ -67,6 +67,7 @@
 #' @param guides Passed to [plot_layout()]
 #' @param top_left Optional ggplot object to show in the top left panel. Will
 #' default to an empty ggplot object
+#' @param keep_empty Keep empty sets in the figure
 #' @param ... Not used
 #' @param na.rm `NA` handling
 #'
@@ -130,7 +131,7 @@ simpleUpSet <- function(
     highlight = NULL, highlight_levels = NULL,
     annotations = list(),
     width = 0.75, height = 0.75, vjust_ylab = 0.8,
-    stripe_colours = c("grey90", "white"),
+    stripe_colours = c("grey90", "white"), keep_empty = FALSE,
     guides = "keep", top_left = NULL, ..., na.rm = TRUE
 ){
 
@@ -138,13 +139,13 @@ simpleUpSet <- function(
   stopifnot(all(c(width, height) < 1))
 
   ## Need to define set levels here for all downstream private funs
-  sets <- .check_sets(x, sets, na.rm)
+  sets <- .check_sets(x, sets, na.rm, keep_empty)
   sets <- .get_set_levels(x, sets, enquo(sort_sets), na.rm)
 
   ## Get intersections table
   intersect_tbl <- .add_intersections(
     x, sets, substitute(sort_intersect), na.rm, enquo(highlight),
-    highlight_levels
+    highlight_levels, keep_empty
   )
 
   ## Sets panel
@@ -428,7 +429,7 @@ simpleUpSet <- function(
 #' @importFrom dplyr summarise
 #' @importFrom tidyselect all_of
 #' @keywords internal
-.check_sets <- function(x, sets, na.rm){
+.check_sets <- function(x, sets, na.rm, keep_empty){
 
   ## Get intersections
   if (is.null(sets)) sets <- colnames(x)
@@ -446,8 +447,11 @@ simpleUpSet <- function(
   )
   ## Check for non-zero values in at least one position
   ## Drop these from the sets going forward
-  has_non_zero <- vapply(x[sets], \(x) any(x == 1), logical(1))
-  sets[has_non_zero]
+  has_non_zero <- TRUE
+  if (!keep_empty) has_non_zero <- vapply(x[sets], \(x) any(x == 1), logical(1))
+  has_values  <- vapply(x[sets], \(x) mean(is.na(x)) < 1, logical(1))
+  sets[has_values & has_non_zero]
+
 }
 
 #' @keywords internal
@@ -455,7 +459,9 @@ simpleUpSet <- function(
 #' @importFrom tidyr pivot_wider
 #' @importFrom rlang quo_is_null !! !!!
 #' @importFrom tidyselect all_of
-.add_intersections <- function(x, sets, sort_expr, na.rm, hl, hl_levels){
+.add_intersections <- function(
+        x, sets, sort_expr, na.rm, hl, hl_levels, keep_empty
+){
 
   ## Coerce all set columns to be logical & remove rows where all are FALSE
   x[sets] <- lapply(x[sets], as.logical)
@@ -486,7 +492,7 @@ simpleUpSet <- function(
     set_tbl <- pivot_longer(set_tbl, all_of(sets), names_to = "set")
     set_tbl$set <- factor(set_tbl$set, levels = sets)
     set_tbl <- arrange(set_tbl, !!!as.list(sort_expr[-1]))
-    set_tbl <- set_tbl[set_tbl[["value"]],]
+    if (!keep_empty) set_tbl <- set_tbl[set_tbl[["value"]],]
     set_tbl <- pivot_wider(
       set_tbl, names_from = "set", values_from = "value", values_fill = FALSE,
       id_cols = any_of(c("temp", "size", "degree", "highlight"))
