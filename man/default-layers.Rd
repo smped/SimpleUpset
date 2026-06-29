@@ -13,6 +13,10 @@ default_set_layers(
   f = comma,
   expand = c(0.2, 0),
   hjust = 1.1,
+  vjust = 0.5,
+  angle = 0,
+  lineheight = 1.2,
+  fontface = 1,
   label_size = 3.5,
   name = "Set Size",
   dry_run = FALSE
@@ -24,7 +28,11 @@ default_intersect_layers(
   labels = "size",
   f = comma,
   expand = c(0, 0.05),
+  hjust = 0.5,
   vjust = -0.5,
+  angle = 0,
+  fontface = 1,
+  lineheight = 1.2,
   label_size = 3.5,
   name = "Intersection Size",
   dry_run = FALSE
@@ -54,9 +62,10 @@ proportion of all intersections}
 
 \item{f}{Function for labelling set or intersection sizes sizes}
 
-\item{expand}{Multiplicative axis expansion passed to \code{\link[ggplot2:expansion]{ggplot2::expansion()}}}
+\item{expand}{Multiplicative axis expansion passed to \code{\link[ggplot2:expansion]{expansion()}}}
 
-\item{hjust, vjust}{Passed to respective elements for simple adjustment of
+\item{hjust, vjust, lineheight, angle, fontface}{Passed to respective elements
+for simple adjustment of
 either set or intersection sizes}
 
 \item{label_size}{Passed to labels for sets and intersections}
@@ -161,7 +170,7 @@ and these tables are specifically passed to those layers.
 Totals are included as 'size' and the proportion of all intersections is
 also included as the column 'prop' for both the sets and intersections panel.
 Whilst default labels are added using 'size', changing this to 'prop' and
-using \code{\link[scales:percent_format]{scales::percent()}} will work and is supported.
+using \code{\link[scales:percent]{scales::percent()}} will work and is supported.
 }
 }
 \examples{

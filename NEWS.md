@@ -1,3 +1,8 @@
+# SimpleUpset 0.1.5
+
+* Bugfix when setting theme using `theme_update()`
+* Added more arguments for manipulating set & intersect labels
+
 # SimpleUpset 0.1.3
 
 * Added 'ascending', 'descending' or 'none' as options for sorting sets

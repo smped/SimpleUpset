@@ -220,6 +220,7 @@ simpleUpSet <- function(
   )
 }
 
+# .plot_grid(p_int, p_sets, grid_points, grid_layers, stripe_colours)
 #' @importFrom dplyr distinct summarise anti_join join_by left_join
 #' @importFrom rlang !!! syms
 #' @importFrom tidyr pivot_longer complete
@@ -228,7 +229,6 @@ simpleUpSet <- function(
 #' @importFrom S7 prop
 #' @import ggplot2
 #' @keywords internal
-#' .plot_grid(p_int, p_sets, grid_points, grid_layers, stripe_colours)
 .plot_grid <- function(p_int, p_sets, layers, stripe_colours){
 
   ## Check the layers
