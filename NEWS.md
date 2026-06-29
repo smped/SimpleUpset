@@ -2,6 +2,7 @@
 
 * Bugfix when setting theme using `theme_update()`
 * Added more arguments for manipulating set & intersect labels
+* Added argument `keep_empty_sets`
 
 # SimpleUpset 0.1.3
 

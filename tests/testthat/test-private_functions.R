@@ -22,7 +22,9 @@ test_that("Set levels are set correctly", {
 test_that(".add_intersections adds & transforms columns", {
   hl <- NULL
   sort_intersect <- substitute(list(desc(size)))
-  tbl <- .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl))
+  tbl <- .add_intersections(
+      movies, sets, sort_intersect, TRUE, enquo(hl), keep_empty = FALSE
+  )
   expect_true(all(vapply(tbl[sets], is.logical, logical(1))))
   expect_true(all(colnames(tbl) %in% c(colnames(movies), "intersect", "degree")))
   expect_null(tbl[["highlight"]])
@@ -35,24 +37,34 @@ test_that("Intersection sorting works as expected", {
   hl <- NULL
 
   sort_intersect <- substitute(list(desc(size)))
-  tbl <- .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl))
+  tbl <- .add_intersections(
+      movies, sets, sort_intersect, TRUE, enquo(hl), keep_empty = FALSE
+  )
   expect_true(which.max(table(tbl$intersect)) == 1)
 
   sort_intersect <- substitute(list(size))
-  tbl <- .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl))
+  tbl <- .add_intersections(
+      movies, sets, sort_intersect, TRUE, enquo(hl), keep_empty = FALSE
+  )
   expect_true(which.max(table(tbl$intersect)) == 27)
 
   sort_intersect <- substitute(list(desc(degree), desc(size)))
-  tbl <- .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl))
+  tbl <- .add_intersections(
+      movies, sets, sort_intersect, TRUE, enquo(hl), keep_empty = FALSE
+  )
   expect_true(which.max(table(tbl$intersect)) == 23)
 
   sort_intersect <- substitute(list(degree, desc(size)))
-  tbl <- .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl))
+  tbl <- .add_intersections(
+      movies, sets, sort_intersect, TRUE, enquo(hl), keep_empty = FALSE
+  )
   expect_true(table(tbl$intersect)[[5]] == 65)
 
   sort_intersect <- substitute(desc(size))
   expect_error(
-    .add_intersections(movies, sets, sort_intersect, TRUE, enquo(hl)),
+    .add_intersections(
+        movies, sets, sort_intersect, TRUE, enquo(hl), keep_empty = FALSE
+    ),
     "Sorting.+"
   )
 
@@ -72,8 +84,11 @@ test_that(".bg_stripes produces GeomRect", {
 })
 
 test_that(".check_sets behaves as expected", {
-  expect_error(.check_sets(movies, "ReleaseDate", TRUE), ".+ReleaseDate.+")
-  expect_error(.check_sets(movies, NULL, TRUE))
-  expect_error(.check_sets(movies, "x", TRUE))
-  expect_equal(.check_sets(movies, sets, TRUE), sets)
+  expect_error(
+      .check_sets(movies, "ReleaseDate", TRUE, keep_empty = FALSE),
+      ".+ReleaseDate.+"
+  )
+  expect_error(.check_sets(movies, NULL, TRUE, FALSE))
+  expect_error(.check_sets(movies, "x", TRUE, FALSE))
+  expect_equal(.check_sets(movies, sets, TRUE, FALSE), sets)
 })
