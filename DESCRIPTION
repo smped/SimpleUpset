@@ -8,6 +8,11 @@ Authors@R: c(
       email = "stephen.pederson.au@gmail.com",
       role = c("aut", "cre"),
       comment = c(ORCID = "0000-0001-8197-3303")
+    ),
+    person(
+      "Lachlan", "Baer",
+      email = "lachlan.baer@adelaide.edu.au",
+      role = c("ctb")
     )
   )
 Description: Create Upset plots using a combination of 'ggplot2' and 'patchwork'.
