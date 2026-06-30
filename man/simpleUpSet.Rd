@@ -26,6 +26,7 @@ simpleUpSet(
   keep_empty = FALSE,
   guides = "keep",
   top_left = NULL,
+  show_sets = TRUE,
   ...,
   na.rm = TRUE
 )
@@ -90,6 +91,8 @@ For no stripes, set as NULL}
 
 \item{top_left}{Optional ggplot object to show in the top left panel. Will
 default to an empty ggplot object}
+
+\item{show_sets}{logical(1). Show the sets panel (default: TRUE)}
 
 \item{...}{Not used}
 
