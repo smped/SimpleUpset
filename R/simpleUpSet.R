@@ -68,6 +68,7 @@
 #' @param top_left Optional ggplot object to show in the top left panel. Will
 #' default to an empty ggplot object
 #' @param keep_empty Keep empty sets in the figure
+#' @param show_sets logical(1). Show the sets panel (default: TRUE)
 #' @param ... Not used
 #' @param na.rm `NA` handling
 #'
@@ -132,7 +133,7 @@ simpleUpSet <- function(
     annotations = list(),
     width = 0.75, height = 0.75, vjust_ylab = 0.8,
     stripe_colours = c("grey90", "white"), keep_empty = FALSE,
-    guides = "keep", top_left = NULL, ..., na.rm = TRUE
+    guides = "keep", top_left = NULL, show_sets = TRUE, ..., na.rm = TRUE
 ){
 
   ## Initial checks & argument handling
@@ -174,11 +175,19 @@ simpleUpSet <- function(
     p_int <- wrap_plots(c(p_upper, list(p_int)), ncol = 1)
   }
 
-  wrap_plots(c(p_null, p_int, p_sets, p_mat), ncol= 2) +
-    plot_layout(
-      axes = "collect", guides = guides,
-      widths = c(1 - width, width), heights = c(height, 1 - height)
-    )
+  if (show_sets) {
+    p <- wrap_plots(c(p_null, p_int, p_sets, p_mat), ncol= 2) +
+      plot_layout(
+        axes = "collect", guides = guides,
+        widths = c(1 - width, width), heights = c(height, 1 - height)
+      )
+  } else {
+    p <- wrap_plots(c(p_int, p_mat), ncol= 1) +
+      plot_layout(
+          axes = "collect", guides = guides, heights = c(height, 1 - height)
+      )
+  }
+  p
 
 }
 
