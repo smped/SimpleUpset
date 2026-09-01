@@ -149,7 +149,7 @@ default_set_layers <- function(
         hjust = hjust, vjust = vjust, angle = angle, size = label_size,
         fontface = fontface, lineheight = lineheight
       ),
-      scale_x_reverse(expand = expansion(expand), name = name, labels = comma),
+      scale_x_reverse(expand = expansion(expand), name = name, labels = f),
       scale_y_discrete(position = "right", name = NULL, labels = NULL),
       theme(
         axis.text.y.right = element_text(hjust = 0.5),
@@ -197,7 +197,7 @@ default_intersect_layers <- function(
         lineheight = lineheight, size = label_size
       ),
       scale_x_discrete(name = NULL, labels = NULL),
-      scale_y_continuous(name = name, expand = expansion(expand), labels = comma),
+      scale_y_continuous(name = name, expand = expansion(expand), labels = f),
       theme(
         axis.ticks.x.bottom = element_blank(),
         margins = margin(5.5, 5.5, 0, 0)
